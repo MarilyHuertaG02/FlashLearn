@@ -1,0 +1,227 @@
+/* Importar o usar estilos base de style.css para el contenedor y top-bar */
+
+.quiz-area {
+    padding: 20px;
+}
+
+/* --- Estilos de Sets Disponibles (Vista 1) --- */
+
+.sets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.quiz-set-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    border-left: 5px solid #539091; /* Color de FlashLearn */
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.quiz-set-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.quiz-set-card h3 {
+    color: #333;
+    margin-top: 0;
+}
+
+.quiz-set-card p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* 🚨 START QUIZ BUTTON: Base de los botones de acción principal */
+.start-quiz-btn {
+    background-color: #539091; 
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px; /* Aumentado el padding para que sea más robusto */
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+    font-weight: 600; /* Lo hacemos más fuerte */
+    font-size: 1rem;
+}
+
+.start-quiz-btn:hover {
+    background-color: #4a7d7e;
+}
+
+
+/* --- Estilos de Quiz Activo (Vista 2) --- */
+
+#quizActiveView h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #539091;
+}
+
+.quiz-card {
+    background-color: #e8f5e9;
+    border: 2px solid #539091;
+    border-radius: 15px;
+    padding: 40px;
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.question-number {
+    color: #888;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+    text-align: left;
+}
+
+.option-btn {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.option-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #539091;
+}
+
+.option-btn.selected {
+    background-color: #539091;
+    color: white;
+    border-color: #539091;
+}
+
+.option-btn.correct {
+    background-color: #4CAF50; /* Verde */
+    color: white;
+    border-color: #4CAF50;
+}
+
+.option-btn.incorrect {
+    background-color: #F44336; /* Rojo */
+    color: white;
+    border-color: #F44336;
+}
+
+#submitAnswerBtn {
+    /* 🚨 ESTILO para el botón de Submit/Siguiente dentro del quiz */
+    background-color: #539091;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    margin-top: 25px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+#submitAnswerBtn:hover:not(:disabled) {
+    background-color: #4a7d7e;
+}
+
+
+/* --- Estilos de Resultados (Vista 3) --- */
+
+#resultsView {
+    text-align: center;
+    padding: 50px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 40px auto;
+}
+
+.results-summary {
+    display: flex;
+    justify-content: space-around;
+    margin: 30px 0;
+}
+
+.result-item {
+    padding: 15px;
+    border-radius: 10px;
+    min-width: 120px;
+}
+
+.result-item.percentage {
+    background-color: #e8f5e9;
+    border: 2px solid #539091;
+}
+
+.result-label {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+#scorePercentage {
+    font-size: 3rem;
+    color: #539091;
+    margin: 5px 0 0;
+}
+
+/* 🚨 ACCIONES Y BOTONES FINALES */
+.actions {
+    margin-top: 30px;
+}
+
+.actions button, .actions a {
+    display: inline-block;
+    margin: 10px;
+    padding: 12px 25px; /* Padding unificado */
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    border: none; /* Resetear el borde */
+}
+
+/* Botón Principal (Repetir Quiz) - Utiliza el color de marca */
+#retakeQuizBtn {
+    background-color: #539091; 
+    color: white;
+}
+
+#retakeQuizBtn:hover {
+    background-color: #4a7d7e;
+}
+
+/* Botón Secundario (Volver al Menú) */
+.actions .btn-secondary {
+    background-color: #e0e0e0;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.actions .btn-secondary:hover {
+    background-color: #d3d3d3;
+}
+
+
+.hidden {
+    display: none !important;
+}

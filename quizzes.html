@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashLearn - Quizzes</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="quizzes.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="img/LogoFL.png">
+                <h2>Flash Learn</h2>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="menu.html"><img src="img/House.png" alt="Inicio icon"><span>Inicio</span></a></li>
+                    <li><a href="flashcards.html"><img src="img/flashcard.png" alt="Flashcard Icon"><span>Flashcards</span></a></li>
+                    <li class="active"><a href="quizzes.html"><img src="img/quiz.png" alt="Quizzes Icon"><span>Quizzes</span></a></li>
+                    <li><a href="creacion.html"><img src="img/create.png" alt="Create Icon"><span>Creación de Flashcards</span></a></li>
+                </ul>
+            </nav>
+            <div class="logout-btn">
+                <button id="logoutBtn">Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="welcome-message">
+                    <h1>¡Pon a prueba tus conocimientos, <span id="userName">Usuario</span>!</h1>
+                    <p>Selecciona un set disponible para comenzar el quiz.</p>
+                </div>
+                <div class="user-info">
+                    <span class="points" id="userPoints">0 Puntos</span>
+                    <div class="user-profile">
+                        <img src="img/user.png" alt="user profile" id="userProfilePic">
+                        <div class="user-details">
+                            <span class="name" id="userProfileName">Usuario</span>
+                            <span class="level" id="userLevel">Nivel 1</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="quiz-area">
+                
+                <div id="setSelectionView">
+                    <h2>Sets de Quiz Disponibles</h2>
+                    <div class="sets-grid" id="availableSetsGrid">
+                        <div class="loading-state">Cargando sets disponibles...</div>
+                    </div>
+                </div>
+
+                <div id="quizActiveView" class="hidden">
+                    <h2 id="quizTitle">Quiz de [Nombre del Set]</h2>
+                    <div id="quizCardContainer">
+                        <div class="quiz-card">
+                            <p class="question-number">Pregunta <span id="currentQuestionNumber">1</span> de <span id="totalQuestions">5</span></p>
+                            <h3 id="questionText"></h3>
+                            <div class="options-container" id="optionsContainer">
+                                </div>
+                            <button id="submitAnswerBtn" class="btn-custom" disabled>Siguiente Pregunta</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="resultsView" class="hidden">
+                    <h2>¡Quiz Completado!</h2>
+                    <div class="results-summary">
+                        <div class="result-item">
+                            <p class="result-label">Ganancia:</p>
+                            <h3 id="pointsGainedDisplay">+0 Puntos</h3> 
+                        </div>
+
+                        <div class="result-item">
+                            <p class="result-label">Aciertos:</p>
+                            <h3 id="correctCount">0/0</h3>
+                        </div>
+                        
+                        <div class="result-item percentage">
+                            <p class="result-label">Porcentaje:</p>
+                            <h1 id="scorePercentage">0%</h1>
+                        </div>
+                        <div class="result-item streak-info">
+                            <p class="result-label">Nueva Racha:</p>
+                            <h3 id="newStreakDays">0 Días</h3>
+                        </div>
+                    </div>
+                    </div>
+
+            </div>
+        </main>
+    </div>
+    
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="user-auth.js"></script>
+    <script type="module" src="utils.js"></script>
+    <script type="module" src="quizzes.js"></script> </body>
+</html>

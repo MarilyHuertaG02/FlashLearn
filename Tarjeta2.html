@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashLearn - Flashcards</title>
+    <link rel="stylesheet" href="Tarjeta2.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="img/LogoFL.png" alt="FlashLearn Logo">
+                <span>FlashLearn</span>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="menu.html"><img src="img/House.png" alt="Inicio"> Inicio</a></li>
+                    <li class="active"><a href="#"><img src="img/flashcard.png" alt="Flashcards"> Flashcards</a></li>
+                    <li><a href="quizzes.html"><img src="img/quiz.png" alt="Quizzes"> Quizzes</a></li>
+                    <li><a href="creacion.html"><img src="img/create.png" alt="Creación"> Creacion de Flashcards</a></li>
+                </ul>
+            </nav>
+
+            <button class="logout-btn" id="logoutBtn">Cerrar Sesión</button> <!-- ID -->
+        </aside>
+
+            <main class="content">
+                <header class="header-top">
+                    <a href="flashcards.html" class="back-link">&larr; Volver a Sets</a> <div class="user-info">
+                        <span class="points" id="userPoints">0 Puntos</span>
+                        <img src="img/user.png" alt="Avatar" class="avatar" id="userProfilePic">
+                        <div class="user-details">
+                            <span id="userProfileName">Usuario</span>
+                            <span id="userLevel">Nivel 1</span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="set-header">
+                    <h1 id="setName">Cargando...</h1> 
+                    <p id="setSubject">Cargando...</p> 
+                </div>
+                <div class="flashcard-area" id="flashcardArea">
+                    <div class="loading-state">Cargando set...</div>
+                </div>
+
+            </main>
+    <script type="module" src="Tarjeta2-auth.js"></script>
+    <script type="module" src="Tarjeta2.js"></script>
+
+</body>
+</html>

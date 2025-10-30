@@ -1,0 +1,171 @@
+/* Estilos generales para ambos modos */
+body {
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    transition: background-color 0.3s, color 0.3s;
+}
+.login-container {
+    width: 100%;
+    max-width: 450px; /* Ancho un poco más grande para los 3 campos */
+    padding: 30px;
+    text-align: center;
+    border-radius: 10px;
+    transition: background-color 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Sombra para resaltar */
+}
+.logo-container {
+    margin-bottom: 20px;
+}
+.logo {
+    width: 150px;
+    height: auto;
+}
+h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    transition: color 0.3s;
+}
+.form-label {
+    text-align: left;
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.form-control-custom {
+    border: none;
+    border-radius: 10px;
+    padding: 12px 15px;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s;
+}
+.form-control-custom::placeholder {
+    opacity: 0.7;
+}
+.btn-custom {
+    background-color: #36454F; /* Gris carbón */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 18px;
+    width: 100%;
+    transition: background-color 0.3s, color 0.3s;
+}
+.btn-custom:hover {
+    background-color: #2c3e50;
+}
+.btn-google {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #ccc;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+}
+.register-link {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #36454F;
+    transition: color 0.3s;
+}
+.register-link a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #8a2be2;
+    transition: color 0.3s;
+}
+.register-link a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos para el botón de cambio de modo */
+.mode-toggle-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 10px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+.mode-toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+.mode-icon {
+    width: 50px;
+    height: 50px;
+}
+
+/* --- Modos de color --- */
+
+/* Modo Claro */
+.light-mode {
+    background-color: #f8f9fa;
+    color: #36454F;
+}
+.light-mode .login-container {
+    background-color: #e6e6fa; /* Fondo del contenedor en modo claro */
+}
+.light-mode .form-label {
+    color: #4b0082;
+}
+.light-mode .form-control-custom {
+    background-color: #fff;
+    color: #4b0082;
+}
+.light-mode .btn-google {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #ccc;
+}
+.light-mode .register-link {
+    color: #36454F;
+}
+.light-mode .register-link a {
+    color: #8a2be2;
+}
+
+/* Modo Oscuro */
+.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+.dark-mode .login-container {
+    background-color: #2c2c2c;
+}
+.dark-mode .form-label {
+    color: #f0f0f0;
+}
+.dark-mode .form-control-custom {
+    background-color: #444;
+    color: #f0f0f0;
+}
+.dark-mode .form-control-custom::placeholder {
+    color: #bdbdbd;
+}
+.dark-mode .btn-custom {
+    background-color: #6495ed;
+}
+.dark-mode .btn-custom:hover {
+    background-color: #5b87dd;
+}
+.dark-mode .btn-google {
+    background-color: #333;
+    color: #f0f0f0;
+    border: 1px solid #555;
+}
+.dark-mode .register-link {
+    color: #e0e0e0;
+}
+.dark-mode .register-link a {
+    color: #6495ed;
+}

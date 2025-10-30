@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Learn - Inicio</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="img/LogoFL.png">
+                <h2>Flash Learn</h2>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li class="active"><a href="menu.html" id="nav-home"><img src="img/House.png" alt="Inicio icon"><span>Inicio</span></a></li>
+                    <li><a href="flashcards.html" id="nav-flashcards"><img src="img/flashcard.png" alt="Flashcard Icon"><span>Flashcards</span></a></li>
+                    <li><a href="quizzes.html" id="nav-quizzes"><img src="img/quiz.png" alt="Quizzes Icon"><span>Quizzes</span></a></li>
+                    <li><a href="creacion.html" id="nav-create"><img src="img/create.png" alt="Create Icon"><span>Creación de Flashcards</span></a></li>
+                </ul>
+            </nav>
+            <div class="logout-btn">
+                <button id="logoutBtn">Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="welcome-message">
+                    <h1>¡Buen día, <span id="userName">Cargando</span>!</h1>
+                    <p>Llevas <span id="streakDays">0</span> días consecutivos aprendiendo.</p>
+                </div>
+                <div class="user-info">
+                    <span class="points" id="userPoints">0 Puntos</span>
+                    <div class="user-profile">
+                        <img src="img/user.png" alt="user profile" id="userProfilePic">
+                        <div class="user-details">
+                            <span class="name" id="userProfileName">Usuario</span>
+                            <span class="level" id="userLevel">Nivel 1</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                
+                <section class="card recent-set">
+                    <h2>Set Reciente</h2>
+                    <div id="recentSetContent">
+                        <div class="loading-state">Cargando sets...</div>
+                    </div>
+                </section>
+                
+                <section class="card my-progress">
+                    <h2>Mi Progreso</h2>
+                    <div class="progress-section flashcards-chart">
+                        <h3>Flashcards aprendidas este mes</h3>
+                        <div class="chart-placeholder">
+                            <canvas id="flashcardsChart"></canvas>
+                        </div>
+                    </div>                        
+                    <div class="progress-section weekly streak">
+                        <h3>Racha semanal</h3>
+                        <div class="streak-days" id="streak-days-container">                 
+                            <span class="day" data-day="0">Lun</span>
+                            <span class="day" data-day="1">Mar</span>
+                            <span class="day" data-day="2">Mié</span>
+                            <span class="day" data-day="3">Jue</span>
+                            <span class="day" data-day="4">Vie</span>
+                            <span class="day" data-day="5">Sáb</span>
+                            <span class="day" data-day="6">Dom</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="utils.js"></script> 
+    <script type="module" src="script.js"></script> 
+</body>
+</html>
