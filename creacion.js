@@ -1,9 +1,9 @@
 // creacion.js - VERSIÓN FINAL CON VISTA PREVIA DE IMAGEN Y GUARDADO EN FIRESTORE
 
-// 🚨 VARIABLE DE CONTROL: Cambia a 'false' cuando la subida funcione
+// VARIABLE DE CONTROL: Cambia a 'false' cuando la subida funcione
 const DEBUG_MODE = false; // Cambiado a false para que la redirección funcione
 
-// 🚨 IMPORTACIONES DE FIREBASE Y AUTH
+// IMPORTACIONES DE FIREBASE Y AUTH
 import { auth, db } from './firebase.js'; 
 import { collection, addDoc } from 'firebase/firestore';
 import { notifications } from './notifications.js'; 
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("DEBUG MODE: Redirección detenida. Verifica Firestore manualmente.");
         } else {
             // Modo Producción: Redirigir a la galería de sets
-            notifications.show('🎉 Set guardado con éxito! Redirigiendo a tus sets...', 'success', 2500);
+            notifications.show('Set guardado con éxito! Redirigiendo a tus sets...', 'success', 2500);
             setTimeout(() => {
                 window.location.href = 'flashcards.html';
             }, 2500);
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("ERROR FATAL AL GUARDAR:", error);
         
         if (DEBUG_MODE) {
-            notifications.show(`❌ FALLO DE FIREBASE: ${error.message}. Verifica reglas y rutas.`, 'error', 10000);
+            notifications.show(`FALLO DE FIREBASE: ${error.message}. Verifica reglas y rutas.`, 'error', 10000);
         } else {
             notifications.show('Error al guardar. Intenta de nuevo más tarde.', 'error');
         }
@@ -259,10 +259,10 @@ document.addEventListener('DOMContentLoaded', () => {
         finishBtn.addEventListener('click', saveSetToFirestore);
     };
 
-    // 🚨 SINCRONIZACIÓN: Espera a que el perfil termine de cargar para iniciar la UI
+    // SINCRONIZACIÓN: Espera a que el perfil termine de cargar para iniciar la UI
     onUserLoaded((user, userData) => {
         currentUser = user; 
-        console.log("✅ Perfil de usuario cargado. Inicializando UI de creación.");
+        console.log("Perfil de usuario cargado. Inicializando UI de creación.");
         attachInitialListeners(); 
     });
 
