@@ -13,14 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let googleLoginInProgress = false;
 
     if (!loginForm) {
-        console.error("❌ No se encontró el formulario de login");
+        console.error("No se encontró el formulario de login");
         return;
     }
 
     // Login normal
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        console.log("✅ Formulario de login enviado");
+        console.log("Formulario de login enviado");
 
         const email = document.getElementById('correo').value;
         const password = document.getElementById('contrasena').value;
@@ -30,24 +30,24 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        console.log("📧 Email:", email);
+        console.log("Email:", email);
         await loginUser(email, password);
     });
     
     // Login con Google
     if (googleLoginBtn) {
-        console.log("✅ Botón de Google encontrado, agregando listener...");
+        console.log("Botón de Google encontrado, agregando listener...");
         googleLoginBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             
             // Prevenir múltiples clics
             if (googleLoginInProgress) {
-                console.log("⏳ Login con Google ya en progreso, ignorando clic...");
+                console.log("Login con Google ya en progreso, ignorando clic...");
                 return;
             }
             
             googleLoginInProgress = true;
-            console.log("🎯 Botón de Google CLICKEADO - Bloqueando más clics");
+            console.log("Botón de Google CLICKEADO - Bloqueando más clics");
             
             // Deshabilitar el botón visualmente
             googleLoginBtn.disabled = true;
@@ -65,11 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     googleLoginBtn.disabled = false;
                     googleLoginBtn.style.opacity = '1';
                     googleLoginBtn.innerHTML = '<img src="img/google-icon.png" alt="Google logo" style="width: 20px; margin-right: 8px;"> Iniciar sesión con Google';
-                    console.log("✅ Botón de Google rehabilitado");
+                    console.log("Botón de Google rehabilitado");
                 }, 3000);
             }
         });
     } else {
-        console.error("❌ Botón de Google NO encontrado");
+        console.error("Botón de Google NO encontrado");
     }
 });

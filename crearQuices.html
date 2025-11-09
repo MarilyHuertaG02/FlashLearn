@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Quiz - FlashLearn</title>
+    <link rel="stylesheet" href="style crear quices.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Oculta todas las preguntas por defecto, el JS mostrará solo la activa */
+        .question-container {
+            display: none; 
+        }
+        /* Aseguramos que la primera pregunta se muestre inicialmente */
+        .question-container:first-of-type {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="./img/LogoFL.png">
+                <h2>Flash Learn</h2>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="menu.html" id="nav-home"><img src="./img/House.png" alt="Inicio icon"><span>Inicio</span></a></li>
+                    <li><a href="flashcards.html" id="nav-flashcards"><img src="./img/flashcard.png" alt="Flashcard Icon"><span>Flashcards</span></a></li>
+                    <li><a href="quizzes.html" id="nav-quizzes"><img src="./img/quiz.png" alt="Quizzes Icon"><span>Quizzes</span></a></li>
+                    <li><a href="creacion.html" id="nav-create-flashcards"><img src="./img/create.png" alt="Create Icon"><span>Creación de Flashcards</span></a></li>
+                    <li class="active">
+                        <a href="crearQuices.html" id="nav-create-quizzes">
+                            <img src="img/addquiz.png" alt="Create Icon">
+                            <span>Creación de Quizzes</span>
+                        </a>
+                    </li>            
+                </ul>
+            </nav>
+            <div class="logout-btn">
+                <button id="logoutBtn">Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="welcome-message">
+                    <h1>Crear Nuevo Quiz, <span id="userName">Cargando</span>!</h1> 
+                    <p>Crea tu propio quiz</p>
+                </div>
+                <div class="user-info">
+                    <span class="points" id="userPoints">0 Puntos</span>
+                    <div class="user-profile">
+                        <img src="img/user.png" alt="user profile" id="userProfilePic">
+                        <div class="user-details">
+                            <span class="name" id="userProfileName">Usuario</span>
+                            <span class="level" id="userLevel">Nivel 1</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        
+            <div class="dashboard-grid">
+                <section class="card">
+            <form id="quizForm">
+                <div class="mb-3">
+                    <label for="quizTitle" class="form-label">Título del Quiz</label>
+                    <input type="text" class="form-control" id="quizTitle" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="quizArea" class="form-label">Área/Materia</label>
+                    <input type="text" class="form-control" id="quizArea" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="quizSummary" class="form-label">Resumen del Quiz</label>
+                    <textarea class="form-control" id="quizSummary" rows="3" required></textarea>
+                </div>
+
+                <div class="image-upload-section mb-4">
+                    <label class="image-placeholder">
+                        <img src="img/agregar.png" class="img-fluid" alt="placeholder" id="imagePlaceholder"> 
+                        <input type="file" accept="image/*" id="setImage" hidden> 
+                    </label>
+                    <p class="text-muted mt-2">Subir imagen</p>
+                </div>
+    
+                <!--Controles de navegación para preguntas -->
+                <div class="d-flex justify-content-center gap-3 mb-4" id="navigation-controls" style="display: none !important;">
+                    <button type="button" id="prevQuestionBtn" class="btn btn-outline-secondary px-4">← Anterior</button>
+                    <button type="button" id="nextQuestionBtn" class="btn btn-primary px-4">Siguiente →</button>
+                </div>
+
+                <div class="d-flex gap-3 mb-4">
+                    <button type="button" class="btn btn-primary" id="addQuestionBtn">+ Agregar Pregunta</button>
+                    <button type="submit" class="btn btn-success">Guardar Quiz</button> 
+                </div>
+
+                <div id="questionsContainer">
+                    <!-- Las preguntas se insertarán aquí dinámicamente -->
+                </div>
+            </form>    
+                </section>
+            </div>
+        </main>
+    </div>
+    <div id="successPopup" class="popup-overlay hidden" style="display: none;">
+    <div class="popup-container">
+        <div class="popup-header success">
+            <h3 class="fw-bold">Título del Popup</h3>
+        </div>
+        <div class="popup-body">
+            <p>Mensaje de éxito.</p>
+        </div>
+        <div class="popup-actions">
+            <button class="btn-popup btn-popup-confirm" id="closeSuccessBtn">Aceptar</button>
+        </div>
+    </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="user-auth.js"></script> 
+    <script type="module" src="crearQuices.js"></script>
+</body>
+</html>

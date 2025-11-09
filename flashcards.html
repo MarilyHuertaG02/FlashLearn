@@ -40,6 +40,12 @@
                             <span>Creación de Flashcards</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="crearQuices.html" id="nav-create">
+                            <img src="img/addquiz.png" alt="Create Icon">
+                            <span>Creación de Quizzes</span>
+                        </a>
+                    </li>    
                 </ul>
             </nav>
             <div class="logout-btn">
@@ -53,7 +59,7 @@
                     <h1>¡Buen día, <span id="userName"></span>!</h1> 
                     <p>Explora nuestros sets predeterminados para comenzar a aprender</p>
                 </div>    
-                    <div class="user-info">
+                <div class="user-info">
                     <span class="points" id="userPoints">0 Puntos</span>
                     <div class="user-profile">
                         <img src="img/user.png" alt="user profile" id="userProfilePic">
@@ -68,15 +74,43 @@
             <div class="sets-grid" id="allSetsContainer">
                 <div class="loading-state">Cargando sets...</div>
             </div>
-            </div>
         </main>
+    </div>
+
+    <!-- 🎯 POPUPS PARA ELIMINAR FLASHCARDS -->
+    <div id="deleteConfirmPopup" class="popup-overlay hidden">
+        <div class="popup-container">
+            <div class="popup-header">
+                <h3>¿Estás seguro?</h3>
+            </div>
+            <div class="popup-body">
+                <p>¿Estás seguro de que quieres eliminar este set de flashcards? <strong>Esta acción no se puede deshacer.</strong></p>
+            </div>
+            <div class="popup-actions">
+                <button id="cancelDeleteBtn" class="btn-popup btn-popup-cancel">Cancelar</button>
+                <button id="confirmDeleteBtn" class="btn-popup btn-popup-confirm">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteSuccessPopup" class="popup-overlay hidden">
+        <div class="popup-container">
+            <div class="popup-header success">
+                <h3>¡Eliminado!</h3>
+            </div>
+            <div class="popup-body">
+                <p>El set de flashcards se ha eliminado correctamente.</p>
+            </div>
+            <div class="popup-actions">
+                <button id="closeSuccessBtn" class="btn-popup btn-popup-confirm">Aceptar</button>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="firebase.js"></script>
     <script type="module" src="auth.js"></script>
-    <script type="module" src="user-auth.js"></script> <script type="module" src="utils.js"></script> 
-    <script type="module" src="flashcard-script.js"></script> ```
-
-
+    <script type="module" src="user-auth.js"></script>
+    <script type="module" src="utils.js"></script> 
+    <script type="module" src="flashcard-script.js"></script>
 </body>
 </html>

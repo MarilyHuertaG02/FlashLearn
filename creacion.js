@@ -1,14 +1,13 @@
-// creacion.js - VERSIÓN FINAL CON VISTA PREVIA DE IMAGEN Y GUARDADO EN FIRESTORE
+// creacion.js - VERSIÓN FINAL CON MODO EDICIÓN
 
-// 🚨 VARIABLE DE CONTROL: Cambia a 'false' cuando la subida funcione
-const DEBUG_MODE = false; // Cambiado a false para que la redirección funcione
+// VARIABLE DE CONTROL: Cambia a 'false' cuando la subida funcione
+const DEBUG_MODE = false;
 
-// 🚨 IMPORTACIONES DE FIREBASE Y AUTH
+// IMPORTACIONES DE FIREBASE Y AUTH
 import { auth, db } from './firebase.js'; 
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc, getDocs, query, orderBy, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { notifications } from './notifications.js'; 
 import { onUserLoaded } from './user-auth.js'; 
-// NOTA: Para subir imágenes, necesitarías importar aquí 'storage', 'ref', etc.
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -33,9 +32,125 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedImageFile = null; 
     let currentUser = null; 
 
+    // Variables de Modo Edición
+    let isEditMode = false;
+    let currentEditId = null;
 
     // =========================================================
-    // 1. LÓGICA DE FIREBASE Y GUARDADO (PRIVADO)
+    // 1. INICIALIZACIÓN (Modificada para Edición)
+    // =========================================================
+    
+    onUserLoaded(async (user, userData) => {
+        currentUser = user; 
+        console.log("Perfil de usuario cargado.");
+
+        // VERIFICAR MODO EDICIÓN
+        const urlParams = new URLSearchParams(window.location.search);
+        currentEditId = urlParams.get('editId');
+        
+        if (currentEditId) {
+            isEditMode = true;
+            document.querySelector('h2.fw-bold').textContent = "Modificar Flashcards";
+            finishBtn.textContent = "Actualizar Set";
+            
+            await loadSetForEditing(user.uid, currentEditId);
+        } else {
+            isEditMode = false;
+            console.log("Modo Creación.");
+            renumberFlashcards();
+            showActiveCard();
+        }
+
+        attachInitialListeners();
+    });
+
+    // =========================================================
+    // 2. NUEVA FUNCIÓN (Cargar Set para Edición)
+    // =========================================================
+
+    async function loadSetForEditing(userId, setId) {
+        notifications.showLoading('Cargando set para editar...');
+        try {
+            // 1. Cargar metadatos
+            const setRef = doc(db, 'usuarios', userId, 'sets', setId);
+            const setSnap = await getDoc(setRef);
+            if (!setSnap.exists()) {
+                throw new Error("El set a editar no existe.");
+            }
+            const setData = setSnap.data();
+
+            // 2. Poblar formulario (Metadatos)
+            setTitleInput.value = setData.titulo || '';
+            setSubjectInput.value = setData.asignatura || '';
+            setDescriptionInput.value = setData.descripcion || '';
+            imagePlaceholder.src = setData.imagenUrl || 'img/default-cover.png';
+
+            // 3. Cargar tarjetas de la subcolección
+            const flashcardsRef = collection(db, 'usuarios', userId, 'sets', setId, 'flashcards');
+            const cardsQuery = query(flashcardsRef, orderBy('orden', 'asc'));
+            const cardsSnapshot = await getDocs(cardsQuery);
+
+            // 4. Poblar formulario (Tarjetas)
+            if (cardsSnapshot.empty) {
+                renumberFlashcards();
+                showActiveCard();
+            } else {
+                // Eliminar la tarjeta de plantilla inicial
+                const firstCard = getAllFlashcards()[0];
+                if (firstCard) firstCard.remove();
+                
+                // Inyectar las tarjetas desde Firebase
+                cardsSnapshot.docs.forEach(doc => {
+                    const cardData = doc.data();
+                    createNewFlashcard(cardData.pregunta, cardData.respuesta);
+                });
+            }
+            
+            // 5. Preparar la UI
+            currentCardIndex = 0;
+            renumberFlashcards();
+            showActiveCard();
+            notifications.hideLoading();
+
+        } catch (error) {
+            console.error("Error al cargar set para edición:", error);
+            notifications.show('Error al cargar datos para editar.', 'error');
+            notifications.hideLoading();
+            isEditMode = false;
+            renumberFlashcards();
+            showActiveCard();
+        }
+    }
+
+    // =========================================================
+    // 3. MODIFICACIÓN DE FUNCIONES DE UI
+    // =========================================================
+
+    // Modificar createNewFlashcard para aceptar valores
+    const createNewFlashcard = (term = '', definition = '') => {
+        const cards = getAllFlashcards();
+        const newFlashcard = flashcardTemplate.cloneNode(true);
+        
+        // Rellenar con los valores (si se pasan)
+        newFlashcard.querySelector('.term').value = term;
+        newFlashcard.querySelector('.definition').value = definition;
+
+        actionButtonsDiv.parentNode.insertBefore(newFlashcard, actionButtonsDiv);
+        
+        if (navigationControls && navigationControls.parentNode) {
+             actionButtonsDiv.parentNode.insertBefore(navigationControls, actionButtonsDiv);
+        }
+        
+        renumberFlashcards();
+        
+        if (!isEditMode) {
+            currentCardIndex = cards.length; 
+            showActiveCard();
+        }
+    };
+
+    // =========================================================
+    // 4. LÓGICA DE FIREBASE Y GUARDADO (ACTUALIZADO)
     // =========================================================
 
     const getFlashcardsData = () => {
@@ -80,40 +195,72 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        notifications.showLoading('Guardando set en la nube...');
+        notifications.showLoading(isEditMode ? 'Actualizando set...' : 'Guardando set en la nube...');
 
         try {
-            // NOTA: La lógica de subida a Storage iría aquí. Por ahora, solo usamos la URL de vista previa.
             const imageUrl = selectedImageFile 
-                                ? imagePlaceholder.src // Usar la URL local de vista previa
+                                ? imagePlaceholder.src
                                 : "img/default-cover.png"; 
 
-            // 1. Crear el documento del set principal (addDoc)
-            const setRef = collection(db, 'usuarios', user.uid, 'sets');
-            const newSetDoc = await addDoc(setRef, {
-                titulo: setTitle,
-                asignatura: setSubject,
-                descripcion: setDescription,
-                userId: user.uid,
-                fechaDeCreacion: new Date(),
-                lastAccessed: new Date(), 
-                imagenUrl: imageUrl 
-            });
+            // Verificar si estamos en modo Edición
+            if (isEditMode) {
+                // LÓGICA DE ACTUALIZACIÓN
+                const setRef = doc(db, 'usuarios', user.uid, 'sets', currentEditId);
+                
+                // 1. Actualizar metadatos del set
+                await updateDoc(setRef, {
+                    titulo: setTitle,
+                    asignatura: setSubject,
+                    descripcion: setDescription,
+                    imagenUrl: imageUrl,
+                    lastAccessed: new Date()
+                });
 
-            const newSetId = newSetDoc.id;
+                // 2. Eliminar tarjetas existentes
+                const flashcardsCollectionRef = collection(db, 'usuarios', user.uid, 'sets', currentEditId, 'flashcards');
+                const existingCardsSnapshot = await getDocs(flashcardsCollectionRef);
+                
+                const deletePromises = [];
+                existingCardsSnapshot.docs.forEach(doc => {
+                    deletePromises.push(deleteDoc(doc.ref));
+                });
+                await Promise.all(deletePromises);
 
-            // 2. Guardar las tarjetas en la subcolección 'flashcards'
-            const batchPromises = [];
-            const flashcardsCollectionRef = collection(db, 'usuarios', user.uid, 'sets', newSetId, 'flashcards');
+                // 3. Agregar nuevas tarjetas
+                const addPromises = flashcardsData.map(card => {
+                    return addDoc(flashcardsCollectionRef, card);
+                });
+                await Promise.all(addPromises);
+                
+                notifications.hideLoading();
+                handleUpdateSuccess();
+                
+            } else {
+                // LÓGICA DE CREACIÓN (la que ya tienes)
+                const setRef = collection(db, 'usuarios', user.uid, 'sets');
+                const newSetDoc = await addDoc(setRef, {
+                    titulo: setTitle,
+                    asignatura: setSubject,
+                    descripcion: setDescription,
+                    userId: user.uid,
+                    fechaDeCreacion: new Date(),
+                    lastAccessed: new Date(), 
+                    imagenUrl: imageUrl 
+                });
 
-            flashcardsData.forEach(card => {
-                batchPromises.push(addDoc(flashcardsCollectionRef, card)); 
-            });
+                const newSetId = newSetDoc.id;
 
-            await Promise.all(batchPromises);
-            
-            notifications.hideLoading();
-            handleSaveSuccess(); 
+                // Guardar las tarjetas en la subcolección 'flashcards'
+                const flashcardsCollectionRef = collection(db, 'usuarios', user.uid, 'sets', newSetId, 'flashcards');
+                const batchPromises = flashcardsData.map(card => {
+                    return addDoc(flashcardsCollectionRef, card);
+                });
+
+                await Promise.all(batchPromises);
+                
+                notifications.hideLoading();
+                handleSaveSuccess();
+            }
 
         } catch (error) {
             notifications.hideLoading();
@@ -121,18 +268,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- FUNCIONES DE DEBUG Y CONTROL DE FLUJO ---
+    // --- FUNCIONES DE DEBUG Y CONTROL DE FLUJO (ACTUALIZADAS) ---
 
     const handleSaveSuccess = () => {
         if (DEBUG_MODE) {
             notifications.show('✔ ÉXITO: Set guardado en DB. Redirección detenida (DEBUG).', 'success', 8000);
             console.log("DEBUG MODE: Redirección detenida. Verifica Firestore manualmente.");
         } else {
-            // Modo Producción: Redirigir a la galería de sets
-            notifications.show('🎉 Set guardado con éxito! Redirigiendo a tus sets...', 'success', 2500);
-            setTimeout(() => {
-                window.location.href = 'flashcards.html';
-            }, 2500);
+            showSuccessPopup('Flashcard Creada con Éxito', 'Tu set de flashcards ha sido guardado correctamente.', 'flashcards.html');
+        }
+    };
+
+    const handleUpdateSuccess = () => {
+        if (DEBUG_MODE) {
+            notifications.show('EXITO: Set actualizado en DB. Redirección detenida (DEBUG).', 'success', 8000);
+            console.log("DEBUG MODE: Redirección detenida. Verifica Firestore manualmente.");
+        } else {
+            showSuccessPopup('Flashcard Actualizada con Éxito', 'Tu set de flashcards ha sido actualizado correctamente.', 'flashcards.html');
         }
     };
 
@@ -140,15 +292,14 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("ERROR FATAL AL GUARDAR:", error);
         
         if (DEBUG_MODE) {
-            notifications.show(`❌ FALLO DE FIREBASE: ${error.message}. Verifica reglas y rutas.`, 'error', 10000);
+            notifications.show(`FALLO DE FIREBASE: ${error.message}. Verifica reglas y rutas.`, 'error', 10000);
         } else {
             notifications.show('Error al guardar. Intenta de nuevo más tarde.', 'error');
         }
     };
 
-
     // =========================================================
-    // 2. FUNCIONES DE UTILIDAD Y VISTA PREVIA
+    // 5. FUNCIONES DE UTILIDAD Y VISTA PREVIA (MANTENIDAS)
     // =========================================================
 
     const setupImagePreview = () => {
@@ -221,22 +372,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const createNewFlashcard = () => {
-        const cards = getAllFlashcards();
-        const newFlashcard = flashcardTemplate.cloneNode(true);
-        newFlashcard.querySelector('.term').value = '';
-        newFlashcard.querySelector('.definition').value = '';
-
-        actionButtonsDiv.parentNode.insertBefore(newFlashcard, actionButtonsDiv);
-        if (navigationControls && navigationControls.parentNode) {
-             actionButtonsDiv.parentNode.insertBefore(navigationControls, actionButtonsDiv);
-        }
-        
-        currentCardIndex = cards.length; 
-        renumberFlashcards();
-        showActiveCard();
-    };
-
     const navigate = (direction) => {
         const cards = getAllFlashcards();
         let newIndex = currentCardIndex + direction;
@@ -246,28 +381,58 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-
     // =========================================================
-    // 3. INICIALIZACIÓN DE LA APLICACIÓN Y EVENTOS
+    // 6. INICIALIZACIÓN DE LA APLICACIÓN Y EVENTOS
     // =========================================================
 
     const attachInitialListeners = () => {
         setupImagePreview(); 
-        addCardBtn.addEventListener('click', createNewFlashcard);
+        addCardBtn.addEventListener('click', () => createNewFlashcard());
         prevCardBtn.addEventListener('click', () => navigate(-1));
         nextCardBtn.addEventListener('click', () => navigate(1));
         finishBtn.addEventListener('click', saveSetToFirestore);
     };
 
-    // 🚨 SINCRONIZACIÓN: Espera a que el perfil termine de cargar para iniciar la UI
-    onUserLoaded((user, userData) => {
-        currentUser = user; 
-        console.log("✅ Perfil de usuario cargado. Inicializando UI de creación.");
-        attachInitialListeners(); 
-    });
-
-
-    // Ejecutar lógica de vista inicial (para que la primera tarjeta sea visible)
-    renumberFlashcards(); 
-    showActiveCard(); 
+    // Función para mostrar el popup de éxito (igual que en flashcards)
+function showSuccessPopup(title, message, redirectUrl) {
+    const popup = document.getElementById('successPopup');
+    const popupTitle = popup.querySelector('h3');
+    const popupMessage = popup.querySelector('p');
+    const closeBtn = document.getElementById('closeSuccessBtn');
+    
+    // Actualizar contenido del popup
+    popupTitle.textContent = title;
+    popupMessage.textContent = message;
+    
+    // Mostrar popup
+    popup.classList.remove('hidden');
+    
+    // Configurar evento del botón cerrar
+    closeBtn.onclick = () => {
+        popup.classList.add('hidden');
+        if (redirectUrl && !DEBUG_MODE) {
+            window.location.href = redirectUrl;
+        }
+    };
+    
+    // Cerrar al hacer clic fuera del popup
+    popup.onclick = (e) => {
+        if (e.target === popup) {
+            popup.classList.add('hidden');
+            if (redirectUrl && !DEBUG_MODE) {
+                window.location.href = redirectUrl;
+            }
+        }
+    };
+    
+    // Redirección automática después de 3 segundos (solo si no está en DEBUG)
+    if (!DEBUG_MODE) {
+        setTimeout(() => {
+            if (!popup.classList.contains('hidden')) {
+                popup.classList.add('hidden');
+                window.location.href = redirectUrl;
+            }
+        }, 3000);
+    }
+}
 });

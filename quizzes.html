@@ -21,6 +21,7 @@
                     <li><a href="flashcards.html"><img src="img/flashcard.png" alt="Flashcard Icon"><span>Flashcards</span></a></li>
                     <li class="active"><a href="quizzes.html"><img src="img/quiz.png" alt="Quizzes Icon"><span>Quizzes</span></a></li>
                     <li><a href="creacion.html"><img src="img/create.png" alt="Create Icon"><span>Creación de Flashcards</span></a></li>
+                    <li><a href="crearQuices.html" id="nav-create"><img src="img/addquiz.png" alt="Create Icon"><span>Creación de Quizzes</span></a></li>                    
                 </ul>
             </nav>
             <div class="logout-btn">
@@ -93,12 +94,68 @@
                     </div>
 
             </div>
+            <div id="statusMessageContainer" class="hidden"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+        
+        if (status === 'success') {
+            const container = document.getElementById('statusMessageContainer');
+            if (container) {
+                container.innerHTML = `
+                    <div class="alert alert-success p-3" role="alert">
+                        ¡Quiz creado con éxito! Ya puedes verlo en la galería.
+                    </div>
+                `;
+                container.classList.remove('hidden');
+                
+                // Limpiar el parámetro de la URL después de mostrar el mensaje
+                history.replaceState(null, '', window.location.pathname);
+                
+                // Opcional: Ocultar el mensaje después de 5 segundos
+                setTimeout(() => { container.classList.add('hidden'); }, 5000);
+            }
+        }
+    });
+</script>
         </main>
     </div>
-    
+<!-- POPUP DE CONFIRMACIÓN PARA ELIMINAR -->
+<div id="deleteConfirmPopup" class="popup-overlay hidden">
+    <div class="popup-container">
+        <div class="popup-header">
+            <h3>¿Estás seguro?</h3>
+        </div>
+        <div class="popup-body">
+            <p>¿Estás seguro de que quieres eliminar este quiz? <strong>Esta acción no se puede deshacer.</strong></p>
+        </div>
+        <div class="popup-actions">
+            <button id="cancelDeleteBtn" class="btn-popup btn-popup-cancel">Cancelar</button>
+            <button id="confirmDeleteBtn" class="btn-popup btn-popup-confirm">Eliminar</button>
+        </div>
+    </div>
+</div>
+
+<!-- POPUP DE ÉXITO -->
+<div id="deleteSuccessPopup" class="popup-overlay hidden">
+    <div class="popup-container">
+        <div class="popup-header success">
+            <h3>¡Eliminado!</h3>
+        </div>
+        <div class="popup-body">
+            <p>El quiz se ha eliminado correctamente.</p>
+        </div>
+        <div class="popup-actions">
+            <button id="closeSuccessBtn" class="btn-popup btn-popup-confirm">Aceptar</button>
+        </div>
+    </div>
+</div>    
     <script type="module" src="firebase.js"></script>
     <script type="module" src="auth.js"></script>
     <script type="module" src="user-auth.js"></script>
     <script type="module" src="utils.js"></script>
-    <script type="module" src="quizzes.js"></script> </body>
+    <script type="module" src="quizzes.js"></script> 
+</body>
 </html>

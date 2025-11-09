@@ -14,11 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Registro normal con email/contraseña
     if (registrationForm) {
-        console.log("✅ Formulario de registro encontrado");
+        console.log("Formulario de registro encontrado");
         
         registrationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            console.log("✅ Formulario de registro enviado");
+            console.log("Formulario de registro enviado");
 
             const email = document.getElementById('correoElectronico').value;
             const password = document.getElementById('password').value;
@@ -29,28 +29,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            console.log("📧 Datos registro:", { email, userName });
+            console.log("Datos registro:", { email, userName });
             await registerUser(email, password, userName);
         });
     } else {
-        console.error("❌ No se encontró el formulario de registro");
+        console.error("No se encontró el formulario de registro");
     }
     
     // Registro con Google
     if (googleRegisterBtn) {
-        console.log("✅ Botón de Google para registro encontrado");
+        console.log("Botón de Google para registro encontrado");
         
         googleRegisterBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             
             // Prevenir múltiples clics
             if (googleRegisterInProgress) {
-                console.log("⏳ Registro con Google ya en progreso, ignorando clic...");
+                console.log("Registro con Google ya en progreso, ignorando clic...");
                 return;
             }
             
             googleRegisterInProgress = true;
-            console.log("🎯 Botón de Google REGISTRO CLICKEADO");
+            console.log("Botón de Google REGISTRO CLICKEADO");
             
             // Deshabilitar el botón visualmente
             googleRegisterBtn.disabled = true;
@@ -68,11 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     googleRegisterBtn.disabled = false;
                     googleRegisterBtn.style.opacity = '1';
                     googleRegisterBtn.textContent = 'Registrarse con Google';
-                    console.log("✅ Botón de Google registro rehabilitado");
+                    console.log("Botón de Google registro rehabilitado");
                 }, 3000);
             }
         });
     } else {
-        console.error("❌ Botón de Google para registro NO encontrado");
+        console.error("Botón de Google para registro NO encontrado");
     }
 });
