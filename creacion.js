@@ -1,7 +1,7 @@
 // creacion.js - VERSIÓN FINAL CON MODO EDICIÓN
 
-// VARIABLE DE CONTROL: Cambia a 'false' cuando la subida funcione
-const DEBUG_MODE = false;
+// 🚨 VARIABLE DE CONTROL: Cambia a 'false' cuando la subida funcione
+const DEBUG_MODE = false; // Cambiado a false para que la redirección funcione
 
 // IMPORTACIONES DE FIREBASE Y AUTH
 import { auth, db } from './firebase.js'; 
@@ -275,16 +275,11 @@ document.addEventListener('DOMContentLoaded', () => {
             notifications.show('✔ ÉXITO: Set guardado en DB. Redirección detenida (DEBUG).', 'success', 8000);
             console.log("DEBUG MODE: Redirección detenida. Verifica Firestore manualmente.");
         } else {
-            showSuccessPopup('Flashcard Creada con Éxito', 'Tu set de flashcards ha sido guardado correctamente.', 'flashcards.html');
-        }
-    };
-
-    const handleUpdateSuccess = () => {
-        if (DEBUG_MODE) {
-            notifications.show('EXITO: Set actualizado en DB. Redirección detenida (DEBUG).', 'success', 8000);
-            console.log("DEBUG MODE: Redirección detenida. Verifica Firestore manualmente.");
-        } else {
-            showSuccessPopup('Flashcard Actualizada con Éxito', 'Tu set de flashcards ha sido actualizado correctamente.', 'flashcards.html');
+            // Modo Producción: Redirigir a la galería de sets
+            notifications.show('🎉 Set guardado con éxito! Redirigiendo a tus sets...', 'success', 2500);
+            setTimeout(() => {
+                window.location.href = 'flashcards.html';
+            }, 2500);
         }
     };
 
@@ -393,46 +388,15 @@ document.addEventListener('DOMContentLoaded', () => {
         finishBtn.addEventListener('click', saveSetToFirestore);
     };
 
-    // Función para mostrar el popup de éxito (igual que en flashcards)
-function showSuccessPopup(title, message, redirectUrl) {
-    const popup = document.getElementById('successPopup');
-    const popupTitle = popup.querySelector('h3');
-    const popupMessage = popup.querySelector('p');
-    const closeBtn = document.getElementById('closeSuccessBtn');
-    
-    // Actualizar contenido del popup
-    popupTitle.textContent = title;
-    popupMessage.textContent = message;
-    
-    // Mostrar popup
-    popup.classList.remove('hidden');
-    
-    // Configurar evento del botón cerrar
-    closeBtn.onclick = () => {
-        popup.classList.add('hidden');
-        if (redirectUrl && !DEBUG_MODE) {
-            window.location.href = redirectUrl;
-        }
-    };
-    
-    // Cerrar al hacer clic fuera del popup
-    popup.onclick = (e) => {
-        if (e.target === popup) {
-            popup.classList.add('hidden');
-            if (redirectUrl && !DEBUG_MODE) {
-                window.location.href = redirectUrl;
-            }
-        }
-    };
-    
-    // Redirección automática después de 3 segundos (solo si no está en DEBUG)
-    if (!DEBUG_MODE) {
-        setTimeout(() => {
-            if (!popup.classList.contains('hidden')) {
-                popup.classList.add('hidden');
-                window.location.href = redirectUrl;
-            }
-        }, 3000);
-    }
-}
+    // 🚨 SINCRONIZACIÓN: Espera a que el perfil termine de cargar para iniciar la UI
+    onUserLoaded((user, userData) => {
+        currentUser = user; 
+        console.log("✅ Perfil de usuario cargado. Inicializando UI de creación.");
+        attachInitialListeners(); 
+    });
+
+
+    // Ejecutar lógica de vista inicial (para que la primera tarjeta sea visible)
+    renumberFlashcards(); 
+    showActiveCard(); 
 });

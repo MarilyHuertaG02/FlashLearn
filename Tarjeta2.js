@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Iniciar el estado de carga
     flashcardArea.innerHTML = getLoadingHTMLStructure();
 
-    // 🚨 MOTOR DE CARGA: Esperar el estado de autenticación ANTES de iniciar la carga del set
+    // MOTOR DE CARGA: Esperar el estado de autenticación ANTES de iniciar la carga del set
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             // Protección de página si no está logueado
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. Actualizar título y asignatura
         setTitle.textContent = setData.titulo || setData.nombre || "Set No Encontrado";
         setSubject.textContent = setData.asignatura || "Asignatura";
-        console.log(`✅ Set cargado (${collectionPathType}): ${setData.titulo}`);
+        console.log(`Set cargado (${collectionPathType}): ${setData.titulo}`);
 
         // 2. Cargar flashcards de la subcolección 'flashcards' del documento encontrado
         const flashcardsRef = collection(setDoc.ref, 'flashcards'); 
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 id: doc.id,
                 ...doc.data()
             }));
-            console.log(`✅ Cargadas ${cards.length} flashcards.`);
+            console.log(`Cargadas ${cards.length} flashcards.`);
         } else {
             throw new Error("No hay flashcards en este set");
         }

@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Iniciar el motor de autenticación
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            console.log("✅ Usuario autenticado:", user.uid);
+            console.log("Usuario autenticado:", user.uid);
             
             // Carga los datos del usuario (incluyendo progreso mensual y ultimaActividad)
             const userData = await loadUserData(user); 
@@ -98,7 +98,7 @@ function setupLogoutButton() {
     }
 }
 
-// 🚨 FUNCIÓN CLAVE: ACTIVAR RACHA SEMANAL BASADA EN LA ÚLTIMA ACTIVIDAD
+// FUNCIÓN CLAVE: ACTIVAR RACHA SEMANAL BASADA EN LA ÚLTIMA ACTIVIDAD
 function setupWeeklyStreak(ultimaActividadTimestamp) {
     const streakDaysContainer = document.getElementById('streak-days-container');
     if (!streakDaysContainer) return;
@@ -135,7 +135,7 @@ function setupWeeklyStreak(ultimaActividadTimestamp) {
 }
 
 
-// 🚨 FUNCIÓN CLAVE: CARGA DEL GRÁFICO
+// FUNCIÓN CLAVE: CARGA DEL GRÁFICO
 function setupProgressChart(progresoMensual) {
     const ctx = document.getElementById('flashcardsChart');
     if (!ctx) return;
