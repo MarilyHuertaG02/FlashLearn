@@ -3,7 +3,8 @@
 import { initializeUserAuth } from './user-auth.js';
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged } from 'firebase/auth';
-import { collection, getDocs, orderBy, query, limit, deleteDoc, doc } from 'firebase/firestore';
+// 🔥 IMPORTACIÓN: getDoc y setDoc para la función compartir
+import { collection, getDocs, orderBy, query, limit, deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore'; 
 import { setupNavigation } from './utils.js';
 import { notifications } from './notifications.js';
 import { handleLogout } from './auth.js';
@@ -12,7 +13,7 @@ import { handleLogout } from './auth.js';
 let setToDelete = null;
 
 // ------------------------------------------
-// FUNCIONES PARA MANEJAR POPUPS
+// FUNCIONES PARA MANEJAR POPUPS (Existentes y Nuevas)
 // ------------------------------------------
 
 function showDeleteConfirmPopup(setId) {
@@ -37,6 +38,28 @@ function hideDeleteSuccessPopup() {
     popup.classList.add('hidden');
 }
 
+// 🔥 NUEVAS FUNCIONES PARA EL POPUP DE COMPARTIR
+function showSharePopup(shareLink) {
+    const popup = document.getElementById('sharePopup');
+    const input = document.getElementById('shareLinkInput');
+    
+    // 1. Establece el enlace en el input
+    input.value = shareLink;
+    
+    // 2. Muestra el popup
+    popup.classList.remove('hidden');
+    
+    // 3. Selecciona el texto en el input para que el usuario pueda copiarlo fácilmente
+    input.select();
+    input.setSelectionRange(0, 99999); // Para móviles
+}
+
+function hideSharePopup() {
+    const popup = document.getElementById('sharePopup');
+    popup.classList.add('hidden');
+}
+
+
 // ------------------------------------------
 // FUNCIÓN MODIFICADA: CONFIRMAR ELIMINACIÓN
 // ------------------------------------------
@@ -48,7 +71,6 @@ async function confirmDeleteSet(setId) {
         return;
     }
 
-    // MOSTRAR POPUP EN LUGAR DE ALERT FEO
     showDeleteConfirmPopup(setId);
 }
 
@@ -84,7 +106,6 @@ async function executeSetDeletion() {
 
         notifications.hideLoading();
         
-        // OCULTAR POPUP DE CONFIRMACIÓN Y MOSTRAR POPUP DE ÉXITO
         hideDeleteConfirmPopup();
         showDeleteSuccessPopup();
 
@@ -124,6 +145,27 @@ function initializePopupListeners() {
         closeSuccessBtn.addEventListener('click', hideDeleteSuccessPopup);
     }
     
+    // 🔥 NUEVOS LISTENERS PARA EL POPUP DE COMPARTIR
+    const closeSharePopupBtn = document.getElementById('closeSharePopupBtn');
+    const copyShareLinkBtn = document.getElementById('copyShareLinkBtn');
+
+    if (closeSharePopupBtn) {
+        closeSharePopupBtn.addEventListener('click', hideSharePopup);
+    }
+
+    if (copyShareLinkBtn) {
+        copyShareLinkBtn.addEventListener('click', () => {
+            const input = document.getElementById('shareLinkInput');
+            
+            // Re-selecciona y copia
+            input.select();
+            input.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(input.value).then(() => {
+                notifications.show('¡Enlace copiado al portapapeles!', 'success', 3000);
+            });
+        });
+    }
+
     // Cerrar popup haciendo clic fuera del contenido
     const popupOverlays = document.querySelectorAll('.popup-overlay');
     popupOverlays.forEach(overlay => {
@@ -194,40 +236,53 @@ async function loadSetsGallery(userId) {
         allSets.forEach(set => {
             const isPrivate = set.type === 'private';
             
-            setsHTML += `
+          // En la función loadSetsGallery, dentro del bucle que genera las tarjetas:
+setsHTML += `
 <div class="set-card">
-        <div class="set-image">
-            <img src="${set.imagen || set.imagenUrl || 'img/default-cover.png'}" alt="${set.titulo}">
-            ${isPrivate ? '<span class="badge bg-success float-end">Tuyo</span>' : ''}
+    <div class="set-image">
+        <img src="${set.imagen || set.imagenUrl || 'img/default-cover.png'}" alt="${set.titulo}">
+        ${isPrivate ? '<span class="badge bg-success float-end">Tuyo</span>' : ''}
+    </div>
+    
+    <div class="set-info">
+        <h3>${set.titulo}</h3>
+        <div class="set-meta">
+            <span class="subject">${set.asignatura || 'Materia'}</span>
         </div>
+        <p class="set-description">${set.descripcion || 'Sin descripción.'}</p>
         
-        <div class="set-info">
-            <h3>${set.titulo}</h3>
-            <div class="set-meta">
-                <span class="subject">${set.asignatura || 'Materia'}</span>
-            </div>
-            <p class="set-description">${set.descripcion || 'Sin descripción.'}</p>
+        <div class="set-actions">
+            <!-- Botón Estudiar en la parte superior, ocupa todo el ancho -->
+            <a href="Tarjeta2.html?set=${set.id}" class="btn-primary study-btn-full">Estudiar</a>
             
-            <div class="set-actions">
+            <!-- Botones secundarios en fila debajo -->
+            <div class="secondary-actions">
                 ${isPrivate ? 
-                    `<a href="creacion.html?editId=${set.id}" class="btn-secondary btn-sm me-2" title="Modificar Flashcards">
+                    `<a href="creacion.html?editId=${set.id}" class="btn-secondary btn-sm" title="Modificar Flashcards">
                         Modificar
                     </a>` 
                     : ''}
+                
+                ${isPrivate ? 
+                    `<button class="btn btn-secondary btn-sm share-set-btn" data-set-id="${set.id}" title="Compartir con enlace">
+                        Compartir
+                    </button>` 
+                    : ''}
+
                 ${isPrivate ? 
                     `<button class="btn btn-secondary btn-sm delete-set-btn" data-set-id="${set.id}" title="Eliminar Set">
                         Eliminar
                     </button>` 
                     : ''}
-                <a href="Tarjeta2.html?set=${set.id}" class="btn-primary">Estudiar</a>
             </div>
         </div>
     </div>
-            `;
+</div>
+`;
         });
         setsGrid.innerHTML = setsHTML;
 
-        // NUEVO: Adjuntar listeners para eliminar sets
+        // Adjuntar listeners para eliminar sets
         document.querySelectorAll('.delete-set-btn').forEach(button => {
             button.addEventListener('click', (e) => {
                 e.stopPropagation(); // Prevenir que el clic se propague
@@ -237,9 +292,70 @@ async function loadSetsGallery(userId) {
             });
         });
 
+        // 🔥 Listener para el botón de compartir
+        document.querySelectorAll('.share-set-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const setId = e.target.dataset.setId;
+                shareSet(userId, setId);
+            });
+        });
+
+
     } catch (error) {
         console.error("Error al cargar la galería. Revisa Reglas de Firestore:", error);
         notifications.show('Error al cargar sets. Revisa tus reglas de lectura.', 'error');
         setsGrid.innerHTML = '<h3>Error al cargar tus sets.</h3><p>Asegúrate de que tus reglas de Firestore permitan la lectura.</p>';
+    }
+}
+
+
+// ------------------------------------------
+// 🔥 FUNCIÓN: COMPARTIR SET (MODIFICADA PARA MOSTRAR POPUP)
+// ------------------------------------------
+
+async function shareSet(userId, setId) {
+    notifications.showLoading('Preparando set para compartir...');
+
+    try {
+        // 1. Obtener la referencia al set privado del usuario
+        const privateSetRef = doc(db, 'usuarios', userId, 'sets', setId);
+        const privateSetSnap = await getDoc(privateSetRef);
+
+        if (!privateSetSnap.exists()) {
+            notifications.show('Error: El set original no fue encontrado.', 'error');
+            notifications.hideLoading();
+            return;
+        }
+
+        const privateSetData = privateSetSnap.data();
+
+        // 2. Definir la colección central de sets compartidos
+        const sharedSetsRef = collection(db, 'setsCompartidos');
+        
+        // 3. Crear o actualizar el documento de referencia en la colección central.
+        const sharedDocRef = doc(sharedSetsRef, setId);
+        await setDoc(sharedDocRef, {
+            // Copiamos metadatos relevantes
+            titulo: privateSetData.titulo,
+            asignatura: privateSetData.asignatura,
+            descripcion: privateSetData.descripcion,
+            imagenUrl: privateSetData.imagenUrl || privateSetData.imagen || 'img/default-cover.png',
+            creadorId: userId,
+            fechaCompartido: new Date(),
+            rutaOrigen: `usuarios/${userId}/sets/${setId}`
+        });
+
+        // 4. Generar el enlace
+        const shareLink = `${window.location.origin}/Tarjeta2.html?set=${setId}&shared=true`;
+
+        notifications.hideLoading();
+        
+        // 5. MUESTRA EL POPUP EN LUGAR DE SOLO COPIAR
+        showSharePopup(shareLink);
+
+    } catch (error) {
+        notifications.hideLoading();
+        console.error("Error al compartir set:", error);
+        notifications.show('Error al compartir set. Revisa reglas de escritura.', 'error');
     }
 }

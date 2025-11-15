@@ -10,6 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
 
     <style>
         /* Oculta todas las flashcards por defecto, el JS mostrará solo la activa */
@@ -35,49 +36,50 @@
     <div class="container-fluid">
         <div class="row min-vh-100">
 
-            <aside class="sidebar col-3 col-md-2 p-0 bg-light"> 
-                <div class="logo p-4">
-                    <img src="img/LogoFL.png" alt="Logo Flash Learn" width="50">
-                    <h2>Flash Learn</h2>
-                </div>
-                <nav class="main-nav">
-                    <ul class="list-unstyled p-0">
-                        <li class="active p-2">
-                            <a href="menu.html" id="nav-home" class="d-flex align-items-center p-2 text-decoration-none">
-                                <img src="img/House.png" alt="Inicio icon" width="20" class="me-2">
-                                <span>Inicio</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="flashcards.html" id="nav-flashcards" class="d-flex align-items-center p-2 text-decoration-none">
-                                <img src="img/flashcard.png" alt="Flashcard Icon" width="20" class="me-2">
-                                <span>Flashcards</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="quizzes.html" id="nav-quizzes" class="d-flex align-items-center p-2 text-decoration-none">
-                                <img src="img/quiz.png" alt="Quizzes Icon" width="20" class="me-2">
-                                <span>Quizzes</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="creacion.html" id="nav-create" class="d-flex align-items-center p-2 text-decoration-none">
-                                <img src="img/create.png" alt="Create Icon" width="20" class="me-2">
-                                <span>Creación de Flashcards</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="crearQuices.html" id="nav-create">
-                                <img src="img/addquiz.png" alt="Create Icon">
-                                <span>Creación de Quizzes</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <div class="logout-btn p-4">
-                    <button class="btn btn-outline-danger w-100" id="logoutBtn">Cerrar Sesión</button>
-                </div>
-            </aside>
+<aside class="sidebar col-3 col-md-2 p-0 bg-light"> 
+    <div class="logo p-4">
+        <img src="img/LogoFL.png" alt="Logo Flash Learn" width="50">
+        <h2>Flash Learn</h2>
+    </div>
+    <nav class="main-nav">
+        <ul class="list-unstyled p-0">
+            <li class="p-2">
+                <a href="menu.html" id="nav-home" class="d-flex align-items-center p-2 text-decoration-none">
+                    <img src="img/House.png" alt="Inicio icon" width="20" class="me-2">
+                    <span>Inicio</span>
+                </a>
+            </li>
+            <li class="p-2">
+                <a href="flashcards.html" id="nav-flashcards" class="d-flex align-items-center p-2 text-decoration-none">
+                    <img src="img/flashcard.png" alt="Flashcard Icon" width="20" class="me-2">
+                    <span>Flashcards</span>
+                </a>
+            </li>
+            <li class="p-2">
+                <a href="quizzes.html" id="nav-quizzes" class="d-flex align-items-center p-2 text-decoration-none">
+                    <img src="img/quiz.png" alt="Quizzes Icon" width="20" class="me-2">
+                    <span>Quizzes</span>
+                </a>
+            </li>
+            <li class="active p-2">
+                <a href="creacion.html" id="nav-create-flashcards" class="d-flex align-items-center p-2 text-decoration-none">
+                    <img src="img/create.png" alt="Create Icon" width="20" class="me-2">
+                    <span>Creación de Flashcards</span>
+                </a>
+            </li>
+            <li class="p-2">
+                <a href="crearQuices.html" id="nav-create-quizzes" class="d-flex align-items-center p-2 text-decoration-none">
+                    <img src="img/addquiz.png" alt="Create Quiz Icon" width="20" class="me-2">
+                    <span>Creación de Quizzes</span>
+                </a>
+            </li>
+            
+        </ul>
+    </nav>
+    <div class="logout-btn p-4">
+        <button class="btn btn-outline-danger w-100" id="logoutBtn">Cerrar Sesión</button>
+    </div>
+</aside>
 
             <main class="col-9 col-md-10 p-5"> 
 
@@ -154,15 +156,30 @@
             </main>
         </div>
     </div>
+    <div id="successPopup" class="popup-overlay hidden" style="display: none;">
+    <div class="popup-container">
+        <div class="popup-header success">
+            <h3 class="fw-bold">Título del Popup</h3>
+        </div>
+        <div class="popup-body">
+            <p>Mensaje de éxito.</p>
+        </div>
+        <div class="popup-actions">
+            <button class="btn-popup btn-popup-confirm" id="closeSuccessBtn">Aceptar</button>
+        </div>
+    </div>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script type="module" src="firebase.js"></script>
     <script type="module" src="auth.js"></script> 
-    
-    <script type="module" src="user-auth.js"></script> 
+    <script type="module" src="script.js"></script>
+    <script type="module" src="user-auth.js"></script>
 
     <script type="module" src="creacion.js"></script>
+    <script src="scriptMO.js"></script>
 
 </body>
 </html>

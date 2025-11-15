@@ -1,13 +1,14 @@
-// quizzes.js 
+// quizzes.js - Controlador Completo de la Página de Quizzes
 
+// Importaciones de todos los módulos necesarios
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, collection, getDocs, updateDoc, addDoc, deleteDoc, query, where, orderBy } from 'firebase/firestore'; 
+import { doc, getDoc, collection, getDocs, updateDoc, addDoc, limit, query, orderBy, setDoc, deleteDoc } from 'firebase/firestore'; 
 import { notifications } from './notifications.js';
 import { handleLogout } from './auth.js'; 
-import { updateStudyStreak } from './user.js';
-import { setupNavigation } from './utils.js';
-import { initializeUserAuth } from './user-auth.js';
+import { updateStudyStreak } from './user.js'; // Función para actualizar la racha
+import { setupNavigation } from './utils.js'; // Función para la navegación del sidebar
+import { initializeUserAuth } from './user-auth.js'; // Motor de carga de perfil
 
 // --- Variables Globales del Quiz ---
 let currentQuizData = []; 
@@ -15,355 +16,188 @@ let currentQuestionIndex = 0;
 let correctAnswers = 0;
 let totalQuestions = 0;
 let selectedSetId = null;
-
-//  VARIABLES GLOBALES PARA EL POPUP
-let quizToDelete = null;
+let currentQuizTitle = ''; // NUEVA VARIABLE: Para almacenar el título del set
 
 // --- DOM Elements ---
 const setSelectionView = document.getElementById('setSelectionView');
 const quizActiveView = document.getElementById('quizActiveView');
 const resultsView = document.getElementById('resultsView');
 const availableSetsGrid = document.getElementById('availableSetsGrid');
+const submitAnswerBtn = document.getElementById('submitAnswerBtn');
 
-// ------------------------------------------
-// FUNCIONES PARA MANEJAR POPUPS
-// ------------------------------------------
-
-function showDeleteConfirmPopup(quizId) {
-    quizToDelete = quizId;
-    const popup = document.getElementById('deleteConfirmPopup');
-    popup.classList.remove('hidden');
-}
-
-function hideDeleteConfirmPopup() {
-    const popup = document.getElementById('deleteConfirmPopup');
-    popup.classList.add('hidden');
-    quizToDelete = null;
-}
-
-function showDeleteSuccessPopup() {
-    const popup = document.getElementById('deleteSuccessPopup');
-    popup.classList.remove('hidden');
-}
-
-function hideDeleteSuccessPopup() {
-    const popup = document.getElementById('deleteSuccessPopup');
-    popup.classList.add('hidden');
-}
-
-// ------------------------------------------
-// INICIALIZAR EVENT LISTENERS PARA POPUPS
-// ------------------------------------------
-
-function initializePopupListeners() {
-    // Popup de confirmación
-    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-    
-    if (cancelDeleteBtn) {
-        cancelDeleteBtn.addEventListener('click', hideDeleteConfirmPopup);
-    }
-    
-    if (confirmDeleteBtn) {
-        confirmDeleteBtn.addEventListener('click', executeQuizDeletion);
-    }
-    
-    // Popup de éxito
-    const closeSuccessBtn = document.getElementById('closeSuccessBtn');
-    if (closeSuccessBtn) {
-        closeSuccessBtn.addEventListener('click', hideDeleteSuccessPopup);
-    }
-    
-    // Cerrar popup haciendo clic fuera del contenido
-    const popupOverlays = document.querySelectorAll('.popup-overlay');
-    popupOverlays.forEach(overlay => {
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) {
-                overlay.classList.add('hidden');
-            }
-        });
-    });
-}
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("quizzes.js iniciado");
-    
-    // Inicializar el perfil
+    // Inicializar el perfil (para el avatar y los puntos)
     initializeUserAuth(); 
     
-    // Configurar el sidebar
+    // Configurar el sidebar y el botón de cerrar sesión
     setupNavigation(); 
-    
-    // INICIALIZAR LISTENERS DE POPUPS
-    initializePopupListeners();
-    
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', handleLogout);
-    }
+    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
-    // Verificar autenticación
+    // Verificar el estado de autenticación (el motor de la página)
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            console.log("Usuario autenticado:", user.uid);
-            fetchAvailableQuizSets(user.uid);
+            fetchAvailableQuizSets();
         } else {
-            console.log("Usuario no autenticado, redirigiendo...");
+            // Proteger la página
             window.location.href = 'index.html';
         }
     });
+    initializeShareListeners();
 });
 
+
 // ------------------------------------------
-// LÓGICA DE CARGA DE SETS CON BOTÓN ELIMINAR
+// LÓGICA DE CARGA DE SETS Y QUIZ ACTIVO
 // ------------------------------------------
 
-async function fetchAvailableQuizSets(userId) {
-    console.log("Buscando quizzes para usuario:", userId);
+async function fetchAvailableQuizSets() {
+    availableSetsGrid.innerHTML = '<div class="loading-state">Cargando sets disponibles...</div>';
     
-    if (!availableSetsGrid) {
-        console.error("availableSetsGrid no encontrado en el DOM");
-        return;
-    }
+    const user = auth.currentUser;
+    if (!user) return; 
     
-    availableSetsGrid.innerHTML = '<div class="loading-state">Cargando quizzes disponibles...</div>';
-
     try {
-        // 1. CARGAR QUIZZES PRIVADOS (Creados por el usuario)
-        console.log("Buscando quizzes privados...");
-        const privateSetsRef = collection(db, 'usuarios', userId, 'quizzes_creados');
+        // 1. CARGAR SETS PRIVADOS
+        const privateSetsRef = collection(db, 'usuarios', user.uid, 'quizzes_creados'); 
         const privateSnapshot = await getDocs(privateSetsRef);
-        
-        const privateSets = privateSnapshot.docs.map(doc => ({ 
-            ...doc.data(), 
-            id: doc.id, 
-            type: 'private'
-        }));
-        
-        console.log("Quizzes privados encontrados:", privateSets.length);
+        const privateSets = privateSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id, type: 'private' }));
 
-        // 2. CARGAR SETS PÚBLICOS (Para convertirlos en quizzes)
-        console.log("Buscando sets públicos...");
+        // 2. CARGAR SETS PÚBLICOS
         const publicSetsRef = collection(db, 'setsPublicos');
         const publicSnapshot = await getDocs(publicSetsRef);
+        const publicSets = publicSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id, type: 'public' }));
         
-        const publicSets = publicSnapshot.docs.map(doc => ({ 
-            ...doc.data(), 
-            id: doc.id, 
-            type: 'public'
-        }));
-        
-        console.log("Sets públicos encontrados:", publicSets.length);
-        
-        // 3. FUSIONAR (Ponemos los privados primero, luego los públicos)
+        // 3. FUSIONAR y renderizar
         const allSets = [...privateSets, ...publicSets];
-        console.log("Total de sets disponibles:", allSets.length);
-
+        
         if (allSets.length === 0) {
-            availableSetsGrid.innerHTML = `
-                <div class="text-center p-4">
-                    <h3>No hay quizzes disponibles por el momento. 😕</h3>
-                    <p>Crea tu primer quiz o espera a que se agreguen más sets públicos.</p>
-                </div>
-            `;
+            availableSetsGrid.innerHTML = '<p class="text-center">No hay quizzes disponibles por el momento. 😕</p>';
             return;
         }
 
-        // 4. INYECTAR HTML CON BOTÓN ELIMINAR
         let setsHTML = '';
         allSets.forEach(set => {
             const isPrivate = set.type === 'private';
-            const imageUrl = set.imagen || set.imagenUrl || 'img/default-quiz-cover.png';
-            const title = set.titulo || 'Set sin título';
-            const subject = set.asignatura || 'General';
+            const imageUrl = set.imagenUrl || set.imagen || 'img/default-quiz-cover.png'; 
             
             setsHTML += `
-            <div class="quiz-set-card" data-set-id="${set.id}" data-set-type="${set.type}">
-                <div class="quiz-set-image-container mb-3">
-                    <img src="${imageUrl}" alt="Cover de Quiz" class="quiz-set-img">
-                    ${isPrivate ? '<span class="badge bg-primary position-absolute top-0 end-0 m-2">PRIVADO</span>' : ''}
-                </div>
-
-                <h3>${title}</h3>
-                <p><strong>Materia:</strong> ${subject}</p>
-                <p><strong>Preguntas:</strong> ${set.totalPreguntas || 'N/A'}</p>
+<div class="set-card">
+    <div class="set-image">
+        <img src="${imageUrl}" alt="${set.titulo || 'Quiz'}">
+        ${isPrivate ? '<span class="badge bg-success float-end">Tuyo</span>' : ''}
+    </div>
+    
+    <div class="set-info">
+        <h3>${set.titulo || 'Quiz sin título'}</h3>
+        <div class="set-meta">
+            <span class="subject">${set.asignatura || 'General'}</span>
+        </div>
+        <p class="set-description">${set.descripcion || 'Pon a prueba tus conocimientos.'}</p>
+        
+        <div class="set-actions">
+            <!-- Botón Comenzar Quiz en la parte superior, ocupa todo el ancho -->
+            <button class="btn-primary study-btn-full start-quiz-btn" 
+                    data-set-id="${set.id}" 
+                    data-set-type="${set.type}">
+                Comenzar Quiz
+            </button>
+            
+            <!-- Botones secundarios en fila debajo -->
+            <div class="secondary-actions">
+                ${isPrivate ? 
+                    `<a href="crearQuices.html?editId=${set.id}" class="btn-secondary btn-sm" title="Modificar Quiz">
+                        Modificar
+                    </a>` 
+                    : ''}
                 
-                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-                    <button class="start-quiz-btn btn btn-primary btn-sm" data-set-id="${set.id}" data-set-type="${set.type}">
-                        Comenzar Quiz
-                    </button>
-                    
-                    <div class="d-flex gap-2">
-                        ${isPrivate ? 
-                            `<a href="crearQuices.html?editId=${set.id}" class="btn btn-secondary btn-sm" title="Modificar Quiz">
-                                Modificar
-                            </a>` 
-                            : ''}
-                        
-                        ${isPrivate ? 
-                            `<button class="btn btn-secondary btn-sm delete-quiz-btn" data-quiz-id="${set.id}" title="Eliminar Quiz">
-                                Eliminar
-                            </button>` 
-                            : ''}
-                    </div>
-                </div>
+                ${isPrivate ? 
+                    `<button class="btn btn-secondary btn-sm share-set-btn" data-set-id="${set.id}" title="Compartir con enlace">
+                        Compartir
+                    </button>` 
+                    : ''}
+
+                ${isPrivate ? 
+                    `<button class="btn btn-secondary btn-sm delete-set-btn" data-set-id="${set.id}" title="Eliminar Quiz">
+                        Eliminar
+                    </button>` 
+                    : ''}
             </div>
-            `;
+        </div>
+    </div>
+</div>
+`;
         });
         
         availableSetsGrid.innerHTML = setsHTML;
         
-        // 5. Adjuntar listeners de clic
         document.querySelectorAll('.start-quiz-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const setId = e.target.dataset.setId;
-                const setType = e.target.dataset.setType;
-                console.log(" Iniciando quiz:", setId, "Tipo:", setType);
-                startQuiz(setId, setType);
-            });
+            button.addEventListener('click', (e) => startQuiz(e.target.dataset.setId, e.target.dataset.setType));
         });
-
-        // Adjuntar listeners para eliminar quizzes
-        document.querySelectorAll('.delete-quiz-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevenir que el clic se propague
-                const quizId = e.target.dataset.quizId;
-                console.log("Solicitando eliminar quiz:", quizId);
-                confirmDeleteQuiz(quizId);
-            });
-        });
-
-        console.log("Quizzes cargados correctamente");
 
     } catch (error) {
         console.error("Error al cargar sets para quiz:", error);
-        notifications.show('Error al cargar quizzes. Revisa la consola para más detalles.', 'error');
-        availableSetsGrid.innerHTML = `
-            <div class="error-state text-center p-4">
-                <h3>Error al cargar quizzes</h3>
-                <p>Revisa tus reglas de Firestore y la conexión a internet.</p>
-                <button onclick="location.reload()" class="btn btn-primary">Reintentar</button>
-            </div>
-        `;
+        notifications.show('Error al cargar sets para quiz.', 'error');
+        showView('setSelectionView');
     }
+     // NUEVO: Adjuntar listeners para eliminar sets
+        // En fetchAvailableQuizSets(), modifica esta parte:
+document.querySelectorAll('.delete-set-btn').forEach(button => {
+    button.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevenir que el clic se propague
+        const setId = e.target.dataset.setId;
+        console.log("Solicitando eliminar set:", setId);
+        confirmDeleteSet(setId);
+    });
+});
+document.querySelectorAll('.share-set-btn').forEach(button => {
+    button.addEventListener('click', (e) => {
+        const quizId = e.target.dataset.setId;
+        const user = auth.currentUser;
+        if (user) {
+            shareQuiz(user.uid, quizId);
+        }
+    });
+});
+
 }
-
-// ------------------------------------------
-//  FUNCIÓN MODIFICADA: CONFIRMAR ELIMINACIÓN
-// ------------------------------------------
-
-async function confirmDeleteQuiz(quizId) {
-    const user = auth.currentUser;
-    if (!user) {
-        notifications.show('Error: Sesión no válida.', 'error');
-        return;
-    }
-
-    // POPUP DE ELIMINACION
-    showDeleteConfirmPopup(quizId);
-}
-
-// ------------------------------------------
-//  NUEVA FUNCIÓN: EJECUTAR ELIMINACIÓN
-// ------------------------------------------
-
-async function executeQuizDeletion() {
-    if (!quizToDelete) return;
-
-    const user = auth.currentUser;
-    if (!user) return;
-
-    try {
-        notifications.showLoading('Eliminando quiz...');
-        
-        // 1. Primero eliminar todas las preguntas de la subcolección
-        const questionsRef = collection(db, 'usuarios', user.uid, 'quizzes_creados', quizToDelete, 'preguntas');
-        const questionsSnapshot = await getDocs(questionsRef);
-        
-        const deleteQuestionsPromises = [];
-        questionsSnapshot.docs.forEach(doc => {
-            deleteQuestionsPromises.push(deleteDoc(doc.ref));
-        });
-        
-        await Promise.all(deleteQuestionsPromises);
-        console.log("Preguntas eliminadas");
-
-        // 2. Luego eliminar el documento principal del quiz
-        const quizRef = doc(db, 'usuarios', user.uid, 'quizzes_creados', quizToDelete);
-        await deleteDoc(quizRef);
-        console.log("Quiz eliminado");
-
-        notifications.hideLoading();
-        
-        // OCULTAR POPUP DE CONFIRMACIÓN Y MOSTRAR POPUP DE ÉXITO
-        hideDeleteConfirmPopup();
-        showDeleteSuccessPopup();
-
-        // 3. Recargar la lista de quizzes después de un delay
-        setTimeout(() => {
-            fetchAvailableQuizSets(user.uid);
-        }, 1500);
-
-    } catch (error) {
-        console.error("Error al eliminar quiz:", error);
-        notifications.hideLoading();
-        hideDeleteConfirmPopup();
-        notifications.show('Error al eliminar el quiz: ' + error.message, 'error');
-    }
-}
-
-// ------------------------------------------
-// LÓGICA DEL QUIZ ACTIVO (MANTENIDA)
-// ------------------------------------------
 
 async function startQuiz(setId, setType) {
-    console.log("Iniciando quiz:", setId, "Tipo:", setType);
     selectedSetId = setId;
     const user = auth.currentUser;
-    
-    if (!user) {
-        notifications.show('Error: Sesión no válida.', 'error');
-        return;
-    }
+    if (!user) return; 
 
     try {
         notifications.showLoading('Cargando preguntas...');
         
         let questionsRef;
+        let setDocRef;
         
-        // Determinar la ruta correcta según el tipo de set
         if (setType === 'private') {
-            // Quiz privado creado por el usuario
-            const quizDocRef = doc(db, 'usuarios', user.uid, 'quizzes_creados', setId);
-            const quizSnap = await getDoc(quizDocRef);
-            
-            if (!quizSnap.exists()) {
-                throw new Error("Quiz privado no encontrado.");
-            }
-            
-            questionsRef = collection(quizDocRef, 'preguntas');
+            setDocRef = doc(db, 'usuarios', user.uid, 'quizzes_creados', setId);
+            questionsRef = collection(setDocRef, 'preguntas');
         } else {
-            // Set público - buscar flashcards
-            const setDocRef = doc(db, 'setsPublicos', setId);
-            const setSnap = await getDoc(setDocRef);
-            
-            if (!setSnap.exists()) {
-                throw new Error("Set público no encontrado.");
-            }
-            
+            setDocRef = doc(db, 'setsPublicos', setId);
             questionsRef = collection(setDocRef, 'flashcards');
         }
 
-        // Cargar preguntas/flashcards
-        const questionsSnapshot = await getDocs(questionsRef);
+        // OBTENER EL TÍTULO DEL SET - MODIFICACIÓN CLAVE
+        const setDoc = await getDoc(setDocRef);
+        if (setDoc.exists()) {
+            const setData = setDoc.data();
+            currentQuizTitle = setData.titulo || 'Quiz sin título';
+        } else {
+            currentQuizTitle = 'Quiz sin título';
+        }
+
+        const cardsSnapshot = await getDocs(questionsRef);
         
-        if (questionsSnapshot.empty) {
+        if (cardsSnapshot.empty) {
             notifications.show('Este set no tiene preguntas disponibles.', 'error');
             return;
         }
 
-        // Procesar las preguntas
-        currentQuizData = questionsSnapshot.docs.map(doc => {
+        currentQuizData = cardsSnapshot.docs.map(doc => {
             const data = doc.data();
             return {
                 id: doc.id,
@@ -376,8 +210,6 @@ async function startQuiz(setId, setType) {
         totalQuestions = currentQuizData.length;
         shuffleArray(currentQuizData);
         
-        console.log("Preguntas cargadas:", currentQuizData.length);
-
         currentQuestionIndex = 0;
         correctAnswers = 0;
         
@@ -386,7 +218,7 @@ async function startQuiz(setId, setType) {
 
     } catch (error) {
         console.error("Error al iniciar el quiz:", error);
-        notifications.show('Error al cargar el quiz: ' + error.message, 'error');
+        notifications.show('Error al iniciar el quiz.', 'error');
         showView('setSelectionView');
     } finally {
         notifications.hideLoading();
@@ -403,39 +235,29 @@ function loadQuestion() {
     const optionsContainer = document.getElementById('optionsContainer');
     const submitAnswerBtn = document.getElementById('submitAnswerBtn');
 
-    if (!optionsContainer || !submitAnswerBtn) {
-        console.error(" Elementos del DOM no encontrados");
-        return;
-    }
+    // 1. Actualizar texto de la pregunta - MODIFICACIÓN CLAVE: Usar currentQuizTitle
+    document.getElementById('quizTitle').textContent = `Quiz: ${currentQuizTitle}`;
+    document.getElementById('currentQuestionNumber').textContent = currentQuestionIndex + 1;
+    document.getElementById('totalQuestions').textContent = totalQuestions;
+    document.getElementById('questionText').textContent = questionData.pregunta;
 
-    // Actualizar UI
-    const quizTitle = document.getElementById('quizTitle');
-    const currentQuestionNumber = document.getElementById('currentQuestionNumber');
-    const totalQuestionsElement = document.getElementById('totalQuestions');
-    const questionText = document.getElementById('questionText');
-
-    if (quizTitle) quizTitle.textContent = `Quiz en progreso`;
-    if (currentQuestionNumber) currentQuestionNumber.textContent = currentQuestionIndex + 1;
-    if (totalQuestionsElement) totalQuestionsElement.textContent = totalQuestions;
-    if (questionText) questionText.textContent = questionData.pregunta;
-
-    // Generar opciones
+    // 2. Generar las opciones
     const options = generateOptions(questionData.respuesta, questionData.opciones_incorrectas);
     
     optionsContainer.innerHTML = options.map(option => `
         <button class="option-btn" data-value="${option.value}">${option.text}</button>
     `).join('');
     
-    // Configurar botón de submit
-    submitAnswerBtn.disabled = true;
-    submitAnswerBtn.textContent = "Selecciona una opción"; 
-    
-    // Remover listener anterior y añadir nuevo
-    submitAnswerBtn.replaceWith(submitAnswerBtn.cloneNode(true));
-    const newSubmitBtn = document.getElementById('submitAnswerBtn');
-    newSubmitBtn.addEventListener('click', checkAnswer); 
+    // 3. Resetear el botón de submit
+    if (submitAnswerBtn) {
+        submitAnswerBtn.disabled = true;
+        submitAnswerBtn.textContent = "Selecciona una opción"; 
+        
+        submitAnswerBtn.removeEventListener('click', nextQuestion);
+        submitAnswerBtn.addEventListener('click', checkAnswer); 
+    }
 
-    // Adjuntar listeners de opción
+    // 4. Adjuntar listeners de opción
     optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
         btn.addEventListener('click', handleOptionSelect);
     });
@@ -454,7 +276,6 @@ function generateOptions(correctAnswer, incorrectOptions) {
         });
     }
     
-    // Si no hay suficientes opciones incorrectas, añadir algunas genéricas
     while (options.length < 4) {
         options.push({ text: `Opción ${options.length}`, value: `Opción ${options.length}` });
     }
@@ -497,7 +318,7 @@ function checkAnswer() {
     if (isCorrect) {
         selectedOption.classList.add('correct');
         correctAnswers++;
-        notifications.show('¡Respuesta Correcta! ', 'success', 1000);
+        notifications.show('¡Respuesta Correcta! ✅', 'success', 1000);
     } else {
         selectedOption.classList.add('incorrect');
         // Marcar la correcta
@@ -513,9 +334,10 @@ function checkAnswer() {
     const submitAnswerBtn = document.getElementById('submitAnswerBtn');
     if (submitAnswerBtn) {
         submitAnswerBtn.textContent = "Siguiente Pregunta >>";
-        submitAnswerBtn.replaceWith(submitAnswerBtn.cloneNode(true));
-        const newSubmitBtn = document.getElementById('submitAnswerBtn');
-        newSubmitBtn.addEventListener('click', nextQuestion);
+        
+        // 🚨 ELIMINAMOS EL REEMPLAZO DE NODO (clonenode) Y SIMPLEMENTE CAMBIAMOS LISTENERS
+        submitAnswerBtn.removeEventListener('click', checkAnswer);
+        submitAnswerBtn.addEventListener('click', nextQuestion);
     }
 }
 
@@ -524,77 +346,105 @@ function nextQuestion() {
     loadQuestion();
 }
 
-function finishQuiz() {
+// 🚨 MODIFICACIÓN CLAVE: Función finishQuiz debe ser ASYNC
+async function finishQuiz() {
     const user = auth.currentUser;
     if (user) {
-        updateQuizResultsAndStreak(user.uid);
+        const results = await updateQuizResultsAndStreak(Math.round((correctAnswers / totalQuestions) * 100));
+        
+        // 1. Actualizar la vista de resultados con los datos de Firebase
+        document.getElementById('correctCount').textContent = `${correctAnswers}/${totalQuestions}`;
+        document.getElementById('scorePercentage').textContent = `${results.scorePercentage}%`;
+        
+        // Mostrar Puntos Ganados y Racha
+        document.getElementById('pointsGainedDisplay').textContent = `+${results.pointsGained} Puntos`;
+        document.getElementById('newStreakDays').textContent = `${results.newStreak} Días`;
     }
     
-    const scorePercentage = Math.round((correctAnswers / totalQuestions) * 100);
+    showView('resultsView');
     
-    const resultsHTML = `
-        <div class="results-container text-center">
-            <h2>🎉 Quiz Completado</h2>
-            <div class="score-display">
-                <h3>Puntuación: ${correctAnswers}/${totalQuestions}</h3>
-                <p>${scorePercentage}% de respuestas correctas</p>
-            </div>
-            <button id="retryQuizBtn" class="btn btn-primary mt-3">Reintentar Quiz</button>
-            <button id="backToSetsBtn" class="btn btn-secondary mt-3">Volver a Quizzes</button>
-        </div>
-    `;
-    
-    if (resultsView) {
-        resultsView.innerHTML = resultsHTML;
-        showView('resultsView');
-        
-        document.getElementById('retryQuizBtn').addEventListener('click', () => {
+    // 🚨 1. ADJUNTAR LISTENER DE REPETIR QUIZ
+    const finalRetakeBtn = document.getElementById('retakeQuizBtn');
+    if (finalRetakeBtn) {
+        finalRetakeBtn.addEventListener('click', () => {
             currentQuestionIndex = 0;
             correctAnswers = 0;
-            shuffleArray(currentQuizData);
+            shuffleArray(currentQuizData); // Re-mezclar
             showView('quizActiveView');
             loadQuestion();
         });
-        
-        document.getElementById('backToSetsBtn').addEventListener('click', () => {
+    }
+    
+    // 🚨 2. ADJUNTAR LISTENER DE VOLVER A SETS
+    const backToSetsBtn = document.getElementById('backToSetsBtn'); // Asumiendo que el botón Volver al Menú tiene este ID
+    if (backToSetsBtn) {
+        backToSetsBtn.addEventListener('click', () => {
             showView('setSelectionView');
         });
     }
 }
 
-async function updateQuizResultsAndStreak(userId) {
+
+async function updateQuizResultsAndStreak(scorePercentage) {
+    const user = auth.currentUser;
+    if (!user) return { newStreak: 0, pointsGained: 0, scorePercentage }; // Valor de retorno seguro
+    
+    const BASE_POINTS = 5; 
+    const pointsGained = Math.ceil((totalQuestions * scorePercentage) / 100) * BASE_POINTS;
+    const currentMonth = new Date().toLocaleString('es-MX', { month: 'short' }).toLowerCase().replace('.', '');
+    
     try {
-        // Actualizar racha de estudio
-        await updateStudyStreak();
-        
-        // Guardar resultados del quiz (opcional)
-        const quizResultsRef = collection(db, 'usuarios', userId, 'quiz_results');
-        await addDoc(quizResultsRef, {
+        // 1. Registrar el resultado del quiz (historial)
+        const quizRef = collection(db, 'usuarios', user.uid, 'quizzes');
+        await addDoc(quizRef, {
             setId: selectedSetId,
-            score: correctAnswers,
-            totalQuestions: totalQuestions,
-            percentage: Math.round((correctAnswers / totalQuestions) * 100),
-            timestamp: new Date()
+            fecha: new Date(),
+            correctas: correctAnswers,
+            totalPreguntas: totalQuestions,
+            porcentaje: scorePercentage / 100
         });
+
+        // 2. Cargar los datos actuales del usuario para hacer el update atómico
+        const userRef = doc(db, 'usuarios', user.uid);
+        const userSnap = await getDoc(userRef);
+        const userData = userSnap.data() || {};
         
-        console.log("Resultados del quiz guardados");
+        // 3. ACTUALIZACIÓN DE DATOS (Puntos y Progreso Mensual)
+        await updateDoc(userRef, {
+            puntosTotales: (userData.puntosTotales || 0) + pointsGained,
+            [`progresoMensual.${currentMonth}`]: (userData.progresoMensual?.[currentMonth] || 0) + totalQuestions
+        });
+
+        // 4. Actualizar la racha diaria
+        const newStreak = await updateStudyStreak(user.uid); 
+
+        notifications.show(`🎉 Ganaste ${pointsGained} Puntos y tu racha es de ${newStreak} días.`, 'success');
+
+        // 5. Retornar el resultado completo
+        return { newStreak: newStreak, pointsGained: pointsGained, scorePercentage: scorePercentage }; 
+
     } catch (error) {
-        console.error("Error al guardar resultados:", error);
+        console.error("Error al guardar resultados, puntos o racha:", error);
+        notifications.show('Error al guardar el progreso.', 'error');
+        return { newStreak: 0, pointsGained: 0, scorePercentage }; 
     }
 }
 
+
+// ------------------------------------------
+// UTILERÍAS
+// ------------------------------------------
+
 function showView(viewId) {
-    const views = ['setSelectionView', 'quizActiveView', 'resultsView'];
-    views.forEach(view => {
-        const element = document.getElementById(view);
-        if (element) {
-            element.classList.add('hidden');
-        }
-    });
+    document.getElementById('setSelectionView').classList.add('hidden');
+    document.getElementById('quizActiveView').classList.add('hidden');
+    document.getElementById('resultsView').classList.add('hidden');
     
-    const activeView = document.getElementById(viewId);
-    if (activeView) {
-        activeView.classList.remove('hidden');
+    document.getElementById(viewId).classList.remove('hidden');
+    
+    // RESETEAR EL TÍTULO CUANDO VUELVES A LA VISTA DE SETS
+    if (viewId === 'setSelectionView') {
+        currentQuizTitle = '';
     }
 }
 
@@ -602,5 +452,197 @@ function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+// ------------------------------------------
+// FUNCIONES PARA ELIMINAR QUIZ
+// ------------------------------------------
+
+let setToDelete = null;
+
+// Función para confirmar eliminación
+function confirmDeleteSet(setId) {
+    setToDelete = setId;
+    showDeletePopup();
+}
+
+// Mostrar popup de confirmación
+function showDeletePopup() {
+    const popup = document.getElementById('deleteConfirmPopup');
+    if (popup) {
+        popup.classList.remove('hidden');
+        
+        // Configurar botones del popup
+        document.getElementById('cancelDeleteBtn').onclick = hideDeletePopup;
+        document.getElementById('confirmDeleteBtn').onclick = executeDeleteSet;
+    }
+}
+
+// Ocultar popup de confirmación
+function hideDeletePopup() {
+    const popup = document.getElementById('deleteConfirmPopup');
+    if (popup) {
+        popup.classList.add('hidden');
+    }
+    setToDelete = null;
+}
+
+// Ejecutar eliminación en Firestore
+async function executeDeleteSet() {
+    if (!setToDelete) return;
+    
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    try {
+        notifications.showLoading('Eliminando quiz...');
+        
+        // Referencia al documento del quiz
+        const quizRef = doc(db, 'usuarios', user.uid, 'quizzes_creados', setToDelete);
+        
+        // PRIMERO: Eliminar todas las preguntas de la subcolección
+        const questionsRef = collection(quizRef, 'preguntas');
+        const questionsSnapshot = await getDocs(questionsRef);
+        
+        // Eliminar cada pregunta individualmente
+        const deletePromises = questionsSnapshot.docs.map(questionDoc => 
+            deleteDoc(doc(questionsRef, questionDoc.id))
+        );
+        
+        await Promise.all(deletePromises);
+        
+        // SEGUNDO: Eliminar el documento principal del quiz
+        await deleteDoc(quizRef);
+        
+        hideDeletePopup();
+        showDeleteSuccessPopup();
+        
+        // Recargar la lista de quizzes
+        setTimeout(() => {
+            fetchAvailableQuizSets();
+            hideDeleteSuccessPopup();
+        }, 2000);
+        
+    } catch (error) {
+        console.error("Error eliminando quiz:", error);
+        notifications.show('Error al eliminar el quiz.', 'error');
+        hideDeletePopup();
+    } finally {
+        notifications.hideLoading();
+    }
+}
+
+// Mostrar popup de éxito
+function showDeleteSuccessPopup() {
+    const popup = document.getElementById('deleteSuccessPopup');
+    if (popup) {
+        popup.classList.remove('hidden');
+        document.getElementById('closeSuccessBtn').onclick = hideDeleteSuccessPopup;
+    }
+}
+
+// Ocultar popup de éxito
+function hideDeleteSuccessPopup() {
+    const popup = document.getElementById('deleteSuccessPopup');
+    if (popup) {
+        popup.classList.add('hidden');
+    }
+}
+// 🔥 FUNCIONES PARA COMPARTIR QUIZ
+function showSharePopup(shareLink) {
+    const popup = document.getElementById('sharePopup');
+    const input = document.getElementById('shareLinkInput');
+    
+    if (popup && input) {
+        input.value = shareLink;
+        popup.classList.remove('hidden');
+        input.select();
+        input.setSelectionRange(0, 99999);
+    }
+}
+
+function hideSharePopup() {
+    const popup = document.getElementById('sharePopup');
+    if (popup) {
+        popup.classList.add('hidden');
+    }
+}
+
+async function shareQuiz(userId, quizId) {
+    notifications.showLoading('Preparando quiz para compartir...');
+
+    try {
+        // 1. Obtener la referencia al quiz privado del usuario
+        const privateQuizRef = doc(db, 'usuarios', userId, 'quizzes_creados', quizId);
+        const privateQuizSnap = await getDoc(privateQuizRef);
+
+        if (!privateQuizSnap.exists()) {
+            notifications.show('Error: El quiz original no fue encontrado.', 'error');
+            notifications.hideLoading();
+            return;
+        }
+
+        const privateQuizData = privateQuizSnap.data();
+
+        // 2. Definir la colección central de quizzes compartidos
+        const sharedQuizzesRef = collection(db, 'quizzesCompartidos');
+        
+        // 3. Crear o actualizar el documento de referencia en la colección central
+        const sharedDocRef = doc(sharedQuizzesRef, quizId);
+        await setDoc(sharedDocRef, {
+            titulo: privateQuizData.titulo,
+            asignatura: privateQuizData.asignatura,
+            descripcion: privateQuizData.descripcion,
+            imagenUrl: privateQuizData.imagenUrl || privateQuizData.imagen || 'img/default-quiz-cover.png',
+            creadorId: userId,
+            fechaCompartido: new Date(),
+            rutaOrigen: `usuarios/${userId}/quizzes_creados/${quizId}`
+        });
+
+        // 4. Generar el enlace
+        const shareLink = `${window.location.origin}/quiz-player.html?quiz=${quizId}&shared=true`;
+
+        notifications.hideLoading();
+        
+        // 5. Mostrar el popup
+        showSharePopup(shareLink);
+
+    } catch (error) {
+        notifications.hideLoading();
+        console.error("Error al compartir quiz:", error);
+        notifications.show('Error al compartir quiz. Revisa reglas de escritura.', 'error');
+    }
+}
+
+// 🔥 INICIALIZAR LISTENERS PARA COMPARTIR
+function initializeShareListeners() {
+    const closeSharePopupBtn = document.getElementById('closeSharePopupBtn');
+    const copyShareLinkBtn = document.getElementById('copyShareLinkBtn');
+
+    if (closeSharePopupBtn) {
+        closeSharePopupBtn.addEventListener('click', hideSharePopup);
+    }
+
+    if (copyShareLinkBtn) {
+        copyShareLinkBtn.addEventListener('click', () => {
+            const input = document.getElementById('shareLinkInput');
+            if (input) {
+                input.select();
+                input.setSelectionRange(0, 99999);
+                navigator.clipboard.writeText(input.value).then(() => {
+                    notifications.show('¡Enlace copiado al portapapeles!', 'success', 3000);
+                });
+            }
+        });
+    }
+
+    // Cerrar popup haciendo clic fuera del contenido
+    const sharePopup = document.getElementById('sharePopup');
+    if (sharePopup) {
+        sharePopup.addEventListener('click', (e) => {
+            if (e.target === sharePopup) {
+                hideSharePopup();
+            }
+        });
     }
 }

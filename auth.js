@@ -17,7 +17,7 @@ import {
 } from 'firebase/firestore'; // Importación limpia
 import { notifications } from './notifications.js';
 
-// Función para crear perfil de usuario
+// Función para crear perfil de usuario (MEJORADA)
 async function createInitialUserProfile(userID, userName, email, photoURL = null) {
     const initialData = {
         nombre: userName,
@@ -32,12 +32,55 @@ async function createInitialUserProfile(userID, userName, email, photoURL = null
 
     try {
         const userRef = doc(db, 'usuarios', userID);
+        
+        // Primero verificar si ya existe
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            console.log("El perfil ya existe, no se crea uno nuevo");
+            return true;
+        }
+        
+        // Si no existe, crear uno nuevo
         await setDoc(userRef, initialData);
         console.log("Perfil inicial de usuario creado en Firestore.");
         return true;
     } catch (error) {
         console.error("Error al crear el perfil en Firestore:", error);
+        
+        // Si el error es de permisos, intentar de manera diferente
+        if (error.code === 'permission-denied') {
+            console.warn("Permisos denegados, el usuario necesitará completar su perfil después");
+            return false;
+        }
         return false;
+    }
+}
+// Función para cargar datos del usuario en localStorage
+async function loadUserDataToStorage(user) {
+    try {
+        // Obtener datos de Firestore
+        const userRef = doc(db, 'usuarios', user.uid);
+        const userSnap = await getDoc(userRef);
+        
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            
+            // Guardar en localStorage para acceso rápido
+            localStorage.setItem('userProfile', JSON.stringify({
+                ...userData,
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                photoURL: user.photoURL
+            }));
+            
+            console.log("Datos de usuario cargados en localStorage");
+            return userData;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error loading user data:', error);
+        return null;
     }
 }
 
@@ -61,9 +104,13 @@ export async function registerUser(email, password, userName) {
         if (profileCreated) {
             notifications.show('¡Cuenta creada exitosamente! Redirigiendo...', 'success', 2000);
             
+            // Cargar datos del usuario antes de redirigir
+            await loadUserDataToStorage(user);
+            
             // Redirigir después de 2 segundos
             setTimeout(() => {
-                window.location.href = 'menu.html';
+                console.log('Nuevo usuario - Redirigiendo al tutorial...');
+                window.location.href = 'tutorial.html';
             }, 2000);
         } else {
             notifications.show('Cuenta creada, pero hubo un problema con el perfil.', 'warning');
@@ -87,12 +134,29 @@ export async function loginUser(email, password) {
         const user = userCredential.user;
         console.log("Login exitoso:", user.uid);
         
+        // Cargar datos del usuario antes de redirigir
+        await loadUserDataToStorage(user);
+        
         notifications.hideLoading();
         notifications.show('¡Inicio de sesión exitoso! Redirigiendo...', 'success', 2000);
         
+        // NUEVO CÓDIGO - Verificar si necesita tutorial
+        const tutorialCompleted = localStorage.getItem('tutorialCompleted');
+        const dontShowTutorial = localStorage.getItem('dontShowTutorial');
+        
+        console.log('Estado tutorial:', { tutorialCompleted, dontShowTutorial });
+        
         // Redirigir después de 2 segundos
         setTimeout(() => {
-            window.location.href = 'menu.html';
+            if (!tutorialCompleted && !dontShowTutorial) {
+                // Redirigir al tutorial
+                console.log('Redirigiendo al tutorial...');
+                window.location.href = 'tutorial.html';
+            } else {
+                // Redirigir al dashboard normal
+                console.log('Redirigiendo al menú principal...');
+                window.location.href = 'menu.html';
+            }
         }, 2000);
         
     } catch (error) {
@@ -102,7 +166,7 @@ export async function loginUser(email, password) {
     }
 }
 
-// LOGIN CON GOOGLE
+// LOGIN CON GOOGLE (MEJORADO)
 export async function loginWithGoogle() {
     console.log("Iniciando login con Google...");
     
@@ -111,7 +175,6 @@ export async function loginWithGoogle() {
     try {
         const provider = new GoogleAuthProvider();
         
-        // Configuración adicional para el popup
         provider.addScope('email');
         provider.addScope('profile');
         provider.setCustomParameters({
@@ -120,31 +183,44 @@ export async function loginWithGoogle() {
         
         console.log("Abriendo popup de Google");
         
-        // Usa 'auth' de la importación
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
         console.log("Google login exitoso:", user.uid, user.email);
         
         // Verificar si el usuario ya existe en Firestore
-        const userRef = doc(db, 'usuarios', user.uid); // Usa 'db' de la importación
+        const userRef = doc(db, 'usuarios', user.uid);
         const userSnap = await getDoc(userRef);
         
         if (!userSnap.exists()) {
             console.log("Creando perfil para usuario de Google");
-            await createInitialUserProfile(
+            const profileCreated = await createInitialUserProfile(
                 user.uid, 
                 user.displayName || user.email.split('@')[0], 
                 user.email, 
                 user.photoURL
             );
+            
+            if (!profileCreated) {
+                console.warn("No se pudo crear el perfil inicial, pero el usuario está autenticado");
+            }
         }
         
-        notifications.hideLoading();
-        notifications.show('Inicio de sesión con Google exitoso Redirigiendo', 'success', 2000);
+        // Intentar cargar datos del usuario
+        await loadUserDataToStorage(user);
         
-        // Redirigir después de 2 segundos
+        notifications.hideLoading();
+        notifications.show('Inicio de sesión con Google exitoso. Redirigiendo...', 'success', 2000);
+        
+        // Redirigir según el estado del tutorial
+        const tutorialCompleted = localStorage.getItem('tutorialCompleted');
+        const dontShowTutorial = localStorage.getItem('dontShowTutorial');
+        
         setTimeout(() => {
-            window.location.href = 'menu.html';
+            if (!tutorialCompleted && !dontShowTutorial) {
+                window.location.href = 'tutorial.html';
+            } else {
+                window.location.href = 'menu.html';
+            }
         }, 2000);
         
     } catch (error) {
@@ -153,7 +229,9 @@ export async function loginWithGoogle() {
         
         let errorMessage = `Error al iniciar sesión con Google: ${error.message}`;
         
-        if (error.code === 'auth/cancelled-popup-request') {
+        if (error.code === 'permission-denied') {
+            errorMessage = 'Error de permisos. Por favor, contacta al administrador.';
+        } else if (error.code === 'auth/cancelled-popup-request') {
             errorMessage = 'Ya hay una solicitud de login en progreso. Espera un momento.';
         } else if (error.code === 'auth/popup-closed-by-user') {
             errorMessage = 'El popup de Google fue cerrado. Intenta nuevamente.';
@@ -162,8 +240,6 @@ export async function loginWithGoogle() {
         }
         
         notifications.show(errorMessage, 'error');
-        
-        // Relanzar el error para que login.js lo maneje
         throw error;
     }
 }
@@ -175,6 +251,11 @@ export async function handleLogout() {
         // Asegúrate de que 'auth' esté disponible en este archivo
         await signOut(auth); 
         
+        // Limpiar datos del localStorage
+        localStorage.removeItem('userProfile');
+        localStorage.removeItem('tutorialCompleted');
+        localStorage.removeItem('dontShowTutorial');
+        
         // Notificación de éxito y redirección
         // Si no usas notifications.js, reemplaza estas líneas con alert() y window.location.href
         notifications.show('Sesión cerrada correctamente', 'success'); 
@@ -185,4 +266,10 @@ export async function handleLogout() {
         console.error('Error al cerrar sesión:', error);
         notifications.show('Error al cerrar sesión', 'error');
     }
+}
+
+// Función para obtener el perfil del usuario desde localStorage
+export function getCurrentUserProfile() {
+    const stored = localStorage.getItem('userProfile');
+    return stored ? JSON.parse(stored) : null;
 }

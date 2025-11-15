@@ -5,8 +5,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flash Learn - Inicio</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+    /* Estilos para el popup de nivel */
+    .level-up-popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+    }
+    
+    .level-up-popup.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .level-up-content {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transform: scale(0.8);
+        transition: transform 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .level-up-popup.active .level-up-content {
+        transform: scale(1);
+    }
+    
+    .level-up-icon {
+        font-size: 4rem;
+        margin-bottom: 15px;
+        animation: bounce 1s infinite alternate;
+    }
+    
+    @keyframes bounce {
+        from { transform: translateY(0); }
+        to { transform: translateY(-15px); }
+    }
+    
+    .level-up-title {
+        font-size: 2rem;
+        color: #539091;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .level-up-message {
+        font-size: 1.2rem;
+        color: #555;
+        margin-bottom: 20px;
+    }
+    
+    .level-up-rewards {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .level-up-reward {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+    
+    .level-up-reward:last-child {
+        margin-bottom: 0;
+    }
+    
+    .level-up-button {
+        background: #539091;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    .level-up-button:hover {
+        background: #4a7d7e;
+    }
+    
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #f00;
+        border-radius: 50%;
+        opacity: 0;
+    }
+</style>
 </head>
 <body>
     <div class="container">
@@ -22,6 +131,7 @@
                     <li><a href="quizzes.html" id="nav-quizzes"><img src="img/quiz.png" alt="Quizzes Icon"><span>Quizzes</span></a></li>
                     <li><a href="creacion.html" id="nav-create"><img src="img/create.png" alt="Create Icon"><span>Creación de Flashcards</span></a></li>
                     <li><a href="crearQuices.html" id="nav-create"><img src="img/addquiz.png" alt="Create Icon"><span>Creación de Quizzes</span></a></li>
+                    
                 </ul>
             </nav>
             <div class="logout-btn">
@@ -42,6 +152,15 @@
                         <div class="user-details">
                             <span class="name" id="userProfileName">Usuario</span>
                             <span class="level" id="userLevel">Nivel 1</span>
+                            <!-- 🎯 BARRA DE PROGRESO DE NIVEL -->
+                            <div class="level-progress-container">
+                                <div class="level-info">
+                                    <span id="levelProgressText">0/100 XP</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div id="levelProgressBar" class="progress-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -77,13 +196,126 @@
                         </div>
                     </div>
                 </section>
+                        
             </div>
         </main>
+    </div>
+    <!-- Popup de subida de nivel -->
+    <div class="level-up-popup" id="levelUpPopup">
+        <div class="level-up-content">
+            <div class="level-up-icon">🎉</div>
+            <h2 class="level-up-title" id="levelUpTitle">¡Nivel Alcanzado!</h2>
+            <p class="level-up-message" id="levelUpMessage">Has alcanzado el nivel <span id="newLevelNumber">1</span></p>
+            
+            <div class="level-up-rewards">
+                <div class="level-up-reward">
+                    <span>Desbloqueaste:</span>
+                    <span id="levelReward">Nueva insignia</span>
+                </div>
+                <div class="level-up-reward">
+                    <span>Recompensa:</span>
+                    <span id="levelPoints">+50 puntos</span>
+                </div>
+            </div>
+            
+            <button class="level-up-button" id="levelUpButton">¡Continuar!</button>
+        </div>
     </div>
     
     <script type="module" src="firebase.js"></script>
     <script type="module" src="auth.js"></script>
     <script type="module" src="utils.js"></script> 
-    <script type="module" src="script.js"></script> 
+    <script type="module" src="script.js"></script>
+    <script src="scriptMO.js"></script>
+    
+    <script>
+        // Función para mostrar el popup de nivel
+        function showLevelUpPopup(newLevel, oldLevel) {
+            const popup = document.getElementById('levelUpPopup');
+            const levelNumber = document.getElementById('newLevelNumber');
+            const levelTitle = document.getElementById('levelUpTitle');
+            const levelMessage = document.getElementById('levelUpMessage');
+            const levelReward = document.getElementById('levelReward');
+            const levelPoints = document.getElementById('levelPoints');
+            const levelButton = document.getElementById('levelUpButton');
+            
+            // Actualizar contenido del popup
+            levelNumber.textContent = newLevel;
+            levelTitle.textContent = `¡Nivel ${newLevel} Alcanzado!`;
+            levelMessage.textContent = `Has subido del nivel ${oldLevel} al nivel ${newLevel}`;
+            
+            // Definir recompensas por nivel
+            const rewards = {
+                5: "Insignia de Aprendiz",
+                10: "Insignia de Estudiante",
+                15: "Insignia de Erudito",
+                20: "Insignia de Maestro"
+            };
+            
+            const pointsReward = newLevel * 10;
+            
+            // Establecer recompensa
+            if (rewards[newLevel]) {
+                levelReward.textContent = rewards[newLevel];
+            } else {
+                levelReward.textContent = "Nuevo nivel desbloqueado";
+            }
+            
+            levelPoints.textContent = `+${pointsReward} puntos`;
+            
+            // Mostrar popup
+            popup.classList.add('active');
+            
+            // Crear efecto de confeti
+            createConfetti();
+            
+            // Cerrar popup al hacer clic en el botón
+            levelButton.onclick = function() {
+                popup.classList.remove('active');
+            };
+            
+            // Cerrar popup al hacer clic fuera del contenido
+            popup.onclick = function(e) {
+                if (e.target === popup) {
+                    popup.classList.remove('active');
+                }
+            };
+        }
+        
+        // Función para crear efecto de confeti
+        function createConfetti() {
+            const popup = document.getElementById('levelUpPopup');
+            const colors = ['#539091', '#4a7d7e', '#f0c419', '#e74c3c', '#3498db', '#9b59b6'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = Math.random() * 100 + '%';
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = confetti.style.width;
+                
+                popup.appendChild(confetti);
+                
+                // Animación del confeti
+                const animation = confetti.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${Math.random() * 300 + 100}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 2000 + 1000,
+                    easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)'
+                });
+                
+                // Eliminar confeti después de la animación
+                animation.onfinish = function() {
+                    confetti.remove();
+                };
+            }
+        }
+        
+        // Exportar función para uso en otros archivos
+        window.showLevelUpPopup = showLevelUpPopup;
+    </script>
 </body>
-</html>
+</html>    

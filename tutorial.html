@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Learn - Tutorial</title>
+    <link rel="stylesheet" href="tutorial.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="tutorial-container">
+        <!-- Tutorial Overlay -->
+        <div class="tutorial-overlay active" id="tutorial-overlay">
+            <div class="tutorial-modal">
+                <button class="skip-tutorial" id="skip-tutorial">Saltar tutorial</button>
+                
+                <!-- Paso 1: Bienvenida -->
+                <div class="tutorial-step active" id="step-1">
+                    <div class="tutorial-header">
+                        <div class="logo-container">
+                            <img src="img/LogoFL.png" alt="Flash Learn Logo" class="tutorial-logo">
+                        </div>
+                        <h2>¡Bienvenido a Flash Learn! 🎉</h2>
+                        <p>Tu plataforma de aprendizaje con flashcards y quizzes</p>
+                    </div>
+                    <div class="tutorial-content">
+                        <div class="welcome-icon">📚</div>
+                        <p>Te guiaremos a través de las funciones principales para que aproveches al máximo tu experiencia de aprendizaje.</p>
+                    </div>
+                    <div class="dont-show-container">
+                        <input type="checkbox" id="dont-show-again">
+                        <label for="dont-show-again">No volver a mostrar este tutorial</label>
+                    </div>
+                    <div class="tutorial-buttons">
+                        <button class="btn btn-secondary" id="btn-close-tutorial">Saltar</button>
+                        <button class="btn btn-primary" id="btn-next-1">Comenzar Tutorial</button>
+                    </div>
+                </div>
+                
+                <!-- Paso 2: Navegación -->
+                <div class="tutorial-step" id="step-2">
+                    <div class="tutorial-header">
+                        <h2>Navegación Principal</h2>
+                        <p>Descubre todas las secciones de Flash Learn</p>
+                    </div>
+                    <div class="tutorial-content">
+                        <div class="feature-grid">
+                            <div class="feature-item">
+                                <div class="feature-icon"><img src="img/House.png" alt="Inicio"></div>
+                                <h4>Inicio</h4>
+                                <p>Tu dashboard con progreso y sets recientes</p>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon"><img src="img/flashcard.png" alt="Flashcards"></div>
+                                <h4>Flashcards</h4>
+                                <p>Estudia con tus tarjetas de memoria</p>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon"><img src="img/quiz.png" alt="Quizzes"></div>
+                                <h4>Quizzes</h4>
+                                <p>Pon a prueba tus conocimientos</p>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon"><img src="img/create.png" alt="Creación"></div>
+                                <h4>Creación</h4>
+                                <p>Crea tus propios flashcards y quizzes</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dont-show-container">
+                        <input type="checkbox" id="dont-show-again-2">
+                        <label for="dont-show-again-2">No volver a mostrar este tutorial</label>
+                    </div>
+                    <div class="tutorial-buttons">
+                        <button class="btn btn-secondary" id="btn-prev-2">Anterior</button>
+                        <button class="btn btn-primary" id="btn-next-2">Siguiente</button>
+                    </div>
+                </div>
+                
+                <!-- Paso 3: Sets de Estudio -->
+                <div class="tutorial-step" id="step-3">
+                    <div class="tutorial-header">
+                        <h2>Tus Sets de Estudio</h2>
+                        <p>Organiza y accede a tu contenido de aprendizaje</p>
+                    </div>
+                    <div class="tutorial-content">
+                        <div class="demo-set">
+                            <div class="set-card demo">
+                                <h3>Vocabulario Inglés</h3>
+                                <p>45 tarjetas • 78% completado</p>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 78%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <p>Encontrarás tus sets de flashcards organizados por temas. Cada set muestra tu progreso actual.</p>
+                    </div>
+                    <div class="dont-show-container">
+                        <input type="checkbox" id="dont-show-again-3">
+                        <label for="dont-show-again-3">No volver a mostrar este tutorial</label>
+                    </div>
+                    <div class="tutorial-buttons">
+                        <button class="btn btn-secondary" id="btn-prev-3">Anterior</button>
+                        <button class="btn btn-primary" id="btn-next-3">Siguiente</button>
+                    </div>
+                </div>
+                
+                <!-- Paso 4: Progreso -->
+                <div class="tutorial-step" id="step-4">
+                    <div class="tutorial-header">
+                        <h2>Seguimiento de Progreso</h2>
+                        <p>Mantén la motivación viendo tu avance</p>
+                    </div>
+                    <div class="tutorial-content">
+                        <div class="progress-demo">
+                            <div class="progress-item">
+                                <div class="progress-icon">🔥</div>
+                                <div class="progress-info">
+                                    <h4>Racha de Estudio</h4>
+                                    <p>Mantén días consecutivos aprendiendo</p>
+                                </div>
+                            </div>
+                            <div class="progress-item">
+                                <div class="progress-icon">📊</div>
+                                <div class="progress-info">
+                                    <h4>Estadísticas</h4>
+                                    <p>Ve tu actividad de aprendizaje</p>
+                                </div>
+                            </div>
+                            <div class="progress-item">
+                                <div class="progress-icon">🏆</div>
+                                <div class="progress-info">
+                                    <h4>Logros</h4>
+                                    <p>Desbloquea recompensas por tu progreso</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dont-show-container">
+                        <input type="checkbox" id="dont-show-again-4">
+                        <label for="dont-show-again-4">No volver a mostrar este tutorial</label>
+                    </div>
+                    <div class="tutorial-buttons">
+                        <button class="btn btn-secondary" id="btn-prev-4">Anterior</button>
+                        <button class="btn btn-accent" id="btn-finish">¡Comenzar a Aprender!</button>
+                    </div>
+                </div>
+                
+                <div class="tutorial-indicators">
+                    <span class="indicator active" data-step="1"></span>
+                    <span class="indicator" data-step="2"></span>
+                    <span class="indicator" data-step="3"></span>
+                    <span class="indicator" data-step="4"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="tutorial.js"></script>
+</body>
+</html>

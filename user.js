@@ -16,13 +16,14 @@ export async function fetchUserData(userID) {
         if (userSnap.exists()) {
             const data = userSnap.data();
             
-            // Mapeo defensivo de datos: garantiza que los números son números
             return {
                 nombre: data.nombre || 'Usuario',
-                puntosTotales: data.puntosTotales || 0,
-                rachaActualDias: data.rachaActualDias || 0,
+                // Mapeo defensivo: asegura que los puntos y racha sean Number.
+                puntosTotales: Number(data.puntosTotales) || 0,
+                rachaActualDias: Number(data.rachaActualDias) || 0,
                 progresoMensual: data.progresoMensual || {},
-                // ... (otros campos como nivelActual, fotoPerfilUrl)
+                fotoPerfilUrl: data.fotoPerfilUrl || 'img/user.png',
+                ultimaActividad: data.ultimaActividad || null
             };
         } else {
             console.warn(`No se encontró el perfil para el ID: ${userID}.`);
@@ -33,7 +34,8 @@ export async function fetchUserData(userID) {
         return null;
     }
 }
-export async function updateStudyStreak(userID) { // <-- ¡Asegúrate del 'export'!
+
+export async function updateStudyStreak(userID) { 
     const today = new Date();
     today.setHours(0, 0, 0, 0); 
 
@@ -50,31 +52,37 @@ export async function updateStudyStreak(userID) { // <-- ¡Asegúrate del 'expor
         lastActivityDate.setHours(0, 0, 0, 0);
     }
     
-    // ... (Tu lógica de cálculo de diffDays) ...
-
     const diffTime = today.getTime() - (lastActivityDate ? lastActivityDate.getTime() : 0);
     const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-    let newStreak = userData.rachaActualDias || 0;
+    let newStreak = Number(userData.rachaActualDias) || 0; // Aseguramos que sea Number
     let updateNeeded = false;
 
     if (diffDays === 1) {
+        // Caso 1: Estudió ayer, aumentamos la racha
         newStreak++;
         updateNeeded = true;
     } else if (diffDays > 1 || !lastActivityDate) {
+        // Caso 2: Rompió la racha o es el primer día registrado
         newStreak = 1;
         updateNeeded = true;
-    } 
-
-    if (updateNeeded || diffDays !== 0) {
+    } else if (diffDays === 0 && newStreak === 0) {
+        // 🚨 CORRECCIÓN CLAVE: Es la PRIMERA actividad, pero registrada hoy.
+        // Forzamos la racha a 1.
+        newStreak = 1;
+        updateNeeded = true;
+    } else if (diffDays === 0 && newStreak > 0) {
+        // Ya estudió hoy y la racha está activa. No hacer nada.
+        return newStreak; 
+    }
+    
+    // Si la racha es nueva o se rompió/actualizó, guardamos el nuevo valor y el timestamp.
+    if (updateNeeded) {
         await updateDoc(userRef, {
             rachaActualDias: newStreak,
             ultimaActividad: new Date()
-        }, { merge: true }); // Usamos merge: true por seguridad
+        }, { merge: true });
         return newStreak;
     }
     return userData.rachaActualDias;
 }
-
-// 🚨 Asegúrate de que tu fetchUserData también esté exportada si la usas en otro lado
-// export async function fetchUserData(userID) { ... }

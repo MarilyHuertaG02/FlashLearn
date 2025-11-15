@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Compartido - FlashLearn</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="welcome-message">
+                    <h1>Set Compartido</h1>
+                    <p>Explora este set de flashcards compartido por otro usuario</p>
+                </div>
+                <div class="user-info">
+                    <a href="index.html" class="btn-primary">Iniciar Sesión</a>
+                </div>
+            </header>
+
+            <div class="shared-set-container" id="sharedSetContainer">
+                <div class="loading-state">Cargando set compartido...</div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="shared-set.js"></script>
+</body>
+</html>

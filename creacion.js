@@ -1,13 +1,14 @@
 // creacion.js - VERSIÓN FINAL CON MODO EDICIÓN
 
 // 🚨 VARIABLE DE CONTROL: Cambia a 'false' cuando la subida funcione
-const DEBUG_MODE = false; // Cambiado a false para que la redirección funcione
+const DEBUG_MODE = false; 
 
 // IMPORTACIONES DE FIREBASE Y AUTH
 import { auth, db } from './firebase.js'; 
 import { collection, addDoc, doc, getDoc, getDocs, query, orderBy, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { notifications } from './notifications.js'; 
 import { onUserLoaded } from './user-auth.js'; 
+
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -57,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             isEditMode = false;
             console.log("Modo Creación.");
+            // NOTA: Estas funciones se llaman aquí y también al final. Se mantiene la lógica del original.
             renumberFlashcards();
             showActiveCard();
         }
@@ -198,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         notifications.showLoading(isEditMode ? 'Actualizando set...' : 'Guardando set en la nube...');
 
         try {
+            // Nota: Aquí no estás subiendo la imagen, solo guardando la URL (placeholder.src)
             const imageUrl = selectedImageFile 
                                 ? imagePlaceholder.src
                                 : "img/default-cover.png"; 
@@ -268,18 +271,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- FUNCIONES DE DEBUG Y CONTROL DE FLUJO (ACTUALIZADAS) ---
+    // --- FUNCIONES DE DEBUG Y CONTROL DE FLUJO (CORREGIDAS PARA MOSTRAR POPUP) ---
 
     const handleSaveSuccess = () => {
         if (DEBUG_MODE) {
             notifications.show('✔ ÉXITO: Set guardado en DB. Redirección detenida (DEBUG).', 'success', 8000);
             console.log("DEBUG MODE: Redirección detenida. Verifica Firestore manualmente.");
         } else {
-            // Modo Producción: Redirigir a la galería de sets
-            notifications.show('🎉 Set guardado con éxito! Redirigiendo a tus sets...', 'success', 2500);
-            setTimeout(() => {
-                window.location.href = 'flashcards.html';
-            }, 2500);
+            // CORREGIDO: Llama al POPUP en modo producción
+            showSuccessPopup('Flashcard Creada con Éxito', 'Tu set de flashcards ha sido guardado correctamente.', 'flashcards.html');
+        }
+    };
+
+    const handleUpdateSuccess = () => {
+        if (DEBUG_MODE) {
+            notifications.show('EXITO: Set actualizado en DB. Redirección detenida (DEBUG).', 'success', 8000);
+            console.log("DEBUG MODE: Redirección detenida. Verifica Firestore manualmente.");
+        } else {
+            // CORREGIDO: Llama al POPUP en modo producción
+            showSuccessPopup('Flashcard Actualizada con Éxito', 'Tu set de flashcards ha sido actualizado correctamente.', 'flashcards.html');
         }
     };
 
@@ -388,15 +398,58 @@ document.addEventListener('DOMContentLoaded', () => {
         finishBtn.addEventListener('click', saveSetToFirestore);
     };
 
-    // 🚨 SINCRONIZACIÓN: Espera a que el perfil termine de cargar para iniciar la UI
-    onUserLoaded((user, userData) => {
-        currentUser = user; 
-        console.log("✅ Perfil de usuario cargado. Inicializando UI de creación.");
-        attachInitialListeners(); 
-    });
+    // renumberFlashcards y showActiveCard ya se llaman en onUserLoaded.
+    // Se mantiene la lógica de inicialización del original.
 
 
-    // Ejecutar lógica de vista inicial (para que la primera tarjeta sea visible)
-    renumberFlashcards(); 
-    showActiveCard(); 
+    // Función para mostrar el popup de éxito (SIN REDIRECCIÓN AUTOMÁTICA)
+function showSuccessPopup(title, message, redirectUrl) {
+    const popup = document.getElementById('successPopup');
+    
+    // Si el elemento no existe, salimos
+    if (!popup) {
+        console.error("Error: Elemento #successPopup no encontrado en el DOM.");
+        // Si no se encuentra, simplemente redirigimos (comportamiento de fallback)
+        if (redirectUrl && !DEBUG_MODE) {
+            window.location.href = redirectUrl;
+        }
+        return;
+    }
+    
+    const popupTitle = popup.querySelector('h3');
+    const popupMessage = popup.querySelector('p');
+    const closeBtn = document.getElementById('closeSuccessBtn');
+    
+    // 1. Actualizar contenido
+    popupTitle.textContent = title;
+    popupMessage.textContent = message;
+    
+    // 2. MOSTRAR popup y aplicar FLEX para centrar
+    popup.classList.remove('hidden');
+    // Asegura el centrado
+    popup.style.display = 'flex'; 
+    
+    // 3. Función de cierre y redirección (solo al dar clic)
+    const closeAndRedirect = () => {
+        popup.classList.add('hidden');
+        // Asegura que se oculte correctamente
+        popup.style.display = 'none'; 
+        if (redirectUrl && !DEBUG_MODE) {
+            window.location.href = redirectUrl;
+        }
+    };
+    
+    // 4. Configurar eventos de cierre (requieren clic)
+    closeBtn.onclick = closeAndRedirect;
+    
+    // Cerrar al hacer clic fuera del popup (overlay)
+    popup.onclick = (e) => {
+        if (e.target === popup) {
+            closeAndRedirect();
+        }
+    };
+    
+    // 🚨 NOTA: Se ha ELIMINADO la redirección automática (setTimeout)
+}
+
 });

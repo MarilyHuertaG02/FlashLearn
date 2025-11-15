@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlashLearn - Flashcards</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -45,8 +46,8 @@
                             <img src="img/addquiz.png" alt="Create Icon">
                             <span>Creación de Quizzes</span>
                         </a>
-                    </li>    
-                </ul>
+                    </li>        
+                        </ul>
             </nav>
             <div class="logout-btn">
                 <button id="logoutBtn">Cerrar Sesión</button>
@@ -106,11 +107,30 @@
             </div>
         </div>
     </div>
-
+<div id="sharePopup" class="popup-overlay hidden">
+        <div class="popup-container">
+            <div class="popup-header">
+                <h3>Compartir Set de Flashcards</h3>
+            </div>
+            <div class="popup-body">
+                <p>Copia el enlace para que otros puedan estudiar este set:</p>
+                <div class="share-link-container">
+                    <input type="text" id="shareLinkInput" value="" readonly>
+                    <button id="copyShareLinkBtn" class="btn-primary btn-sm">Copiar</button>
+                </div>
+                <div class="share-social-icons">
+                </div>
+            </div>
+            <div class="popup-actions">
+                <button id="closeSharePopupBtn" class="btn-popup btn-popup-cancel">Cerrar</button>
+            </div>
+        </div>
+    </div>
     <script type="module" src="firebase.js"></script>
     <script type="module" src="auth.js"></script>
     <script type="module" src="user-auth.js"></script>
     <script type="module" src="utils.js"></script> 
     <script type="module" src="flashcard-script.js"></script>
+    <script src="scriptMO.js"></script> 
 </body>
 </html>

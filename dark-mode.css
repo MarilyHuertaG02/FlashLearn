@@ -1,0 +1,949 @@
+/* dark-mode.css - Estilos globales para modo oscuro */
+
+/* Variables CSS para modo oscuro */
+:root {
+  --dark-bg-primary: #121212;
+  --dark-bg-secondary: #1e1e1e;
+  --dark-bg-card: #2c2c2c;
+  --dark-text-primary: #e0e0e0;
+  --dark-text-secondary: #b0b0b0;
+  --dark-border: #333333;
+  --dark-accent: #6495ed;
+}
+
+/* Aplicar modo oscuro al body */
+body.dark-mode {
+  background-color: var(--dark-bg-primary);
+  color: var(--dark-text-primary);
+}
+
+/* Sidebar en modo oscuro */
+body.dark-mode .sidebar {
+  background-color: var(--dark-bg-secondary);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .logo h2 {
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .main-nav a {
+  color: var(--dark-text-secondary);
+}
+
+body.dark-mode .main-nav a:hover {
+  background-color: rgba(83, 144, 145, 0.2);
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .main-nav li.active a {
+  background-color: rgba(83, 144, 145, 0.3);
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .main-nav img {
+  filter: brightness(0.8);
+}
+
+body.dark-mode .logout-btn button {
+  background-color: var(--dark-bg-card);
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .logout-btn button:hover {
+  background-color: #333;
+}
+
+/* Contenido principal en modo oscuro */
+body.dark-mode .main-content {
+  background-color: var(--dark-bg-primary);
+}
+
+body.dark-mode .welcome-message h1 {
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .welcome-message p {
+  color: var(--dark-text-secondary);
+}
+
+body.dark-mode .points {
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .user-details .level {
+  color: var(--dark-text-secondary);
+}
+
+/* Tarjetas en modo oscuro */
+body.dark-mode .card {
+  background-color: var(--dark-bg-card);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .card h2 {
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .set-details h3 {
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .subject {
+  background: rgba(83, 144, 145, 0.2);
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .cards-count {
+  background: rgba(83, 144, 145, 0.3);
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .progress-section {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .progress-info span {
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .progress-bar {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .progress-stats {
+  color: var(--dark-text-secondary);
+}
+
+/* Gráficos y elementos específicos */
+body.dark-mode .chart-placeholder {
+  background: transparent;
+}
+
+/* Estados vacíos en modo oscuro */
+body.dark-mode .empty-state h3 {
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .empty-state p {
+  color: var(--dark-text-secondary);
+}
+
+body.dark-mode .btn-secondary {
+  background-color: var(--dark-bg-secondary);
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .btn-secondary:hover {
+  background-color: #333;
+}
+
+/* Popups en modo oscuro */
+body.dark-mode .popup-container {
+  background: var(--dark-bg-card);
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .popup-header {
+  border-bottom: 1px solid var(--dark-border);
+}
+
+body.dark-mode .popup-body p {
+  color: var(--dark-text-secondary);
+}
+
+/* Barra de progreso de nivel */
+body.dark-mode .level-progress-container .progress-bar {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Sets grid en modo oscuro */
+body.dark-mode .set-card {
+  background: var(--dark-bg-card);
+  border-left: 4px solid var(--dark-accent);
+}
+
+body.dark-mode .set-info h3 {
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .set-description {
+  color: var(--dark-text-secondary);
+}
+
+/* Botones de estudio en modo oscuro */
+body.dark-mode .study-btn {
+  background: var(--dark-accent);
+}
+
+body.dark-mode .study-btn:hover {
+  background: #5b87dd;
+}
+/* dark-mode.css - Estilos globales para modo oscuro */
+
+/* Variables CSS para modo oscuro */
+:root {
+  --dark-bg-primary: #121212;
+  --dark-bg-secondary: #1e1e1e;
+  --dark-bg-card: #2c2c2c;
+  --dark-bg-input: #333333;
+  --dark-text-primary: #e0e0e0;
+  --dark-text-secondary: #b0b0b0;
+  --dark-border: #444444;
+  --dark-accent: #6495ed;
+}
+
+/* Aplicar modo oscuro al body */
+body.dark-mode {
+  background-color: var(--dark-bg-primary);
+  color: var(--dark-text-primary);
+}
+
+/* ===== ESTILOS PARA CREACION.HTML ===== */
+
+/* Sidebar en modo oscuro */
+body.dark-mode .sidebar {
+  background-color: var(--dark-bg-secondary) !important;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .logo h2 {
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .main-nav a {
+  color: var(--dark-text-secondary);
+  background-color: transparent !important;
+}
+
+body.dark-mode .main-nav a:hover {
+  background-color: rgba(83, 144, 145, 0.2) !important;
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .main-nav li.active a {
+  background-color: rgba(83, 144, 145, 0.3) !important;
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .main-nav img {
+  filter: brightness(0.8);
+}
+
+body.dark-mode .logout-btn button {
+  background-color: var(--dark-bg-card) !important;
+  color: var(--dark-text-primary) !important;
+  border-color: var(--dark-border) !important;
+}
+
+body.dark-mode .logout-btn button:hover {
+  background-color: #333 !important;
+}
+
+/* Contenido principal en modo oscuro */
+body.dark-mode .bg-light {
+  background-color: var(--dark-bg-secondary) !important;
+}
+
+body.dark-mode main {
+  background-color: var(--dark-bg-primary) !important;
+}
+
+/* Textos y títulos */
+body.dark-mode h2,
+body.dark-mode .fw-bold {
+  color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .text-muted {
+  color: var(--dark-text-secondary) !important;
+}
+
+/* ===== FORMULARIOS Y CAMPOS DE TEXTO ===== */
+
+/* Labels */
+body.dark-mode .fw-semibold,
+body.dark-mode label {
+  color: var(--dark-text-primary) !important;
+}
+
+/* Campos de formulario */
+body.dark-mode .form-control {
+  background-color: var(--dark-bg-input) !important;
+  border-color: var(--dark-border) !important;
+  color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .form-control::placeholder {
+  color: var(--dark-text-secondary) !important;
+}
+
+body.dark-mode .form-control:focus {
+  background-color: var(--dark-bg-input) !important;
+  border-color: var(--dark-accent) !important;
+  color: var(--dark-text-primary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(100, 149, 237, 0.25) !important;
+}
+
+/* Tarjetas de flashcards */
+body.dark-mode .bg-white {
+  background-color: var(--dark-bg-card) !important;
+}
+
+body.dark-mode .shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .rounded-3 {
+  border-color: var(--dark-border) !important;
+}
+
+/* ===== BOTONES ===== */
+
+/* Botón primario */
+body.dark-mode .btn-primary {
+  background-color: var(--dark-accent) !important;
+  border-color: var(--dark-accent) !important;
+  color: white !important;
+}
+
+body.dark-mode .btn-primary:hover {
+  background-color: #5b87dd !important;
+  border-color: #5b87dd !important;
+}
+
+/* Botón success (añadir más) */
+body.dark-mode .btn-success {
+  background-color: #28a745 !important;
+  border-color: #28a745 !important;
+}
+
+body.dark-mode .btn-success:hover {
+  background-color: #218838 !important;
+  border-color: #1e7e34 !important;
+}
+
+/* Botón outline secondary */
+body.dark-mode .btn-outline-secondary {
+  border-color: var(--dark-border) !important;
+  color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .btn-outline-secondary:hover {
+  background-color: var(--dark-border) !important;
+  border-color: var(--dark-border) !important;
+  color: var(--dark-text-primary) !important;
+}
+
+/* Botón danger (logout) */
+body.dark-mode .btn-outline-danger {
+  border-color: #dc3545 !important;
+  color: #dc3545 !important;
+}
+
+body.dark-mode .btn-outline-danger:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+/* ===== USER INFO ===== */
+
+body.dark-mode .user-info .points {
+  color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .user-details .name {
+  color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .user-details .level {
+  color: var(--dark-text-secondary) !important;
+}
+
+/* ===== ÁREA DE IMAGEN ===== */
+
+body.dark-mode .border {
+  border-color: var(--dark-border) !important;
+  background-color: var(--dark-bg-card) !important;
+}
+
+body.dark-mode .border:hover {
+  border-color: var(--dark-accent) !important;
+}
+
+/* ===== POPUPS ===== */
+
+body.dark-mode .popup-container {
+  background: var(--dark-bg-card) !important;
+  color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .popup-header {
+  border-bottom: 1px solid var(--dark-border) !important;
+}
+
+body.dark-mode .popup-header h3 {
+  color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .popup-body p {
+  color: var(--dark-text-secondary) !important;
+}
+
+/* ===== BOTÓN DE MODO OSCURO ===== */
+
+.mode-toggle-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 12px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+}
+
+body.dark-mode .mode-toggle-btn {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mode-toggle-btn:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .mode-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mode-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* ===== ESTILOS ADICIONALES PARA MEJOR VISUALIZACIÓN ===== */
+
+/* Asegurar que los textos sean legibles */
+body.dark-mode * {
+  border-color: var(--dark-border) !important;
+}
+
+/* Mejorar contraste de los placeholders */
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #888 !important;
+}
+
+/* Ajustar el contenedor principal */
+body.dark-mode .container-fluid {
+  background-color: var(--dark-bg-primary) !important;
+}
+
+/* Estilos para el área de subida de imagen */
+body.dark-mode .text-center .border {
+  background-color: var(--dark-bg-card) !important;
+}
+
+body.dark-mode .text-center .border:hover {
+  background-color: var(--dark-bg-input) !important;
+}
+/* ===== ESTILOS ESPECÍFICOS PARA CREARQUICES.HTML ===== */
+
+/* Contenedor principal del quiz */
+body.dark-mode #quizForm {
+    background-color: var(--dark-bg-card) !important;
+    border-radius: 12px;
+    padding: 25px;
+}
+
+/* Campos de formulario específicos de crearQuices */
+body.dark-mode .form-control {
+    background-color: var(--dark-bg-input) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .form-control::placeholder {
+    color: var(--dark-text-secondary) !important;
+}
+
+body.dark-mode .form-control:focus {
+    background-color: var(--dark-bg-input) !important;
+    border-color: var(--dark-accent) !important;
+    color: var(--dark-text-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(100, 149, 237, 0.25) !important;
+}
+
+/* Labels del formulario */
+body.dark-mode .form-label {
+    color: var(--dark-text-primary) !important;
+}
+
+/* Contenedor de preguntas */
+body.dark-mode .question-container {
+    background-color: var(--dark-bg-card) !important;
+    border-color: var(--dark-border) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.dark-mode .question-container h4 {
+    color: var(--dark-text-primary) !important;
+    border-bottom-color: var(--dark-accent) !important;
+}
+
+/* Contenedor de opciones */
+body.dark-mode .options-container {
+    background-color: var(--dark-bg-input) !important;
+    border-color: var(--dark-border) !important;
+}
+
+body.dark-mode .options-container label {
+    color: var(--dark-text-primary) !important;
+}
+
+/* Área de subida de imagen */
+body.dark-mode .image-placeholder {
+    border-color: var(--dark-border) !important;
+    background-color: var(--dark-bg-card) !important;
+}
+
+body.dark-mode .image-placeholder:hover {
+    border-color: var(--dark-accent) !important;
+    background-color: var(--dark-bg-input) !important;
+}
+
+/* Texto de ayuda para subir imagen */
+body.dark-mode .text-muted {
+    color: var(--dark-text-secondary) !important;
+}
+
+/* Botones específicos de crearQuices */
+body.dark-mode .btn-outline-secondary {
+    background-color: transparent !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .btn-outline-secondary:hover {
+    background-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+/* Controles de navegación */
+body.dark-mode #navigation-controls {
+    background-color: transparent !important;
+}
+
+/* Ajustes para el grid del dashboard */
+body.dark-mode .dashboard-grid {
+    background-color: transparent !important;
+}
+
+/* Tarjeta principal */
+body.dark-mode .card {
+    background-color: var(--dark-bg-card) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Títulos dentro de la tarjeta */
+body.dark-mode .card h2 {
+    color: var(--dark-text-primary) !important;
+}
+
+/* Ajustes para el textarea */
+body.dark-mode textarea.form-control {
+    background-color: var(--dark-bg-input) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode textarea.form-control:focus {
+    background-color: var(--dark-bg-input) !important;
+    border-color: var(--dark-accent) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+/* ===== CORRECCIONES ESPECÍFICAS PARA LOS CAMPOS DE OPCIONES ===== */
+
+/* Campos de opciones dentro del contenedor de opciones */
+body.dark-mode .options-container .form-control {
+    background-color: var(--dark-bg-card) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .options-container .form-control:focus {
+    background-color: var(--dark-bg-card) !important;
+    border-color: var(--dark-accent) !important;
+}
+
+/* Estilos para las opciones falsas específicamente */
+body.dark-mode input[type="text"].form-control.option-input {
+    background-color: var(--dark-bg-input) !important;
+    border: 1px solid var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode input[type="text"].form-control.option-input::placeholder {
+    color: var(--dark-text-secondary) !important;
+}
+
+/* Asegurar que todos los inputs de texto tengan modo oscuro */
+body.dark-mode input[type="text"],
+body.dark-mode input[type="password"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="number"],
+body.dark-mode textarea {
+    background-color: var(--dark-bg-input) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+/* Override específico para Bootstrap */
+body.dark-mode .form-control:not(select) {
+    background-color: var(--dark-bg-input) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+/* Contenedor de cada opción individual */
+body.dark-mode .option-item {
+    background-color: var(--dark-bg-input) !important;
+    border-color: var(--dark-border) !important;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* Labels de las opciones */
+body.dark-mode .option-item label {
+    color: var(--dark-text-primary) !important;
+}
+
+/* Radio buttons en modo oscuro */
+body.dark-mode input[type="radio"] {
+    accent-color: var(--dark-accent);
+}
+
+/* Estilo para el texto de las opciones cuando están llenas */
+body.dark-mode .option-text {
+    color: var(--dark-text-primary) !important;
+}
+/* ===== ESTILOS ESPECÍFICOS PARA QUIZZES.HTML ===== */
+
+/* Contenedor principal del quiz */
+body.dark-mode .quiz-area {
+    background-color: var(--dark-bg-primary) !important;
+}
+
+/* Tarjetas de sets de quiz */
+body.dark-mode .quiz-set-card {
+    background-color: var(--dark-bg-card) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .quiz-set-card h3 {
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .quiz-set-card p {
+    color: var(--dark-text-secondary) !important;
+}
+
+/* Tarjeta del quiz activo */
+body.dark-mode .quiz-card {
+    background-color: var(--dark-bg-card) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .quiz-card h3 {
+    color: var(--dark-text-primary) !important;
+}
+
+/* Número de pregunta */
+body.dark-mode .question-number {
+    color: var(--dark-text-secondary) !important;
+}
+
+/* Botones de opciones */
+body.dark-mode .option-btn {
+    background-color: var(--dark-bg-input) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .option-btn:hover {
+    background-color: var(--dark-border) !important;
+    border-color: var(--dark-accent) !important;
+}
+
+body.dark-mode .option-btn.selected {
+    background-color: var(--dark-accent) !important;
+    border-color: var(--dark-accent) !important;
+    color: white !important;
+}
+
+body.dark-mode .option-btn.correct {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+    color: white !important;
+}
+
+body.dark-mode .option-btn.incorrect {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+}
+
+/* Vista de resultados */
+body.dark-mode .results-summary {
+    background-color: var(--dark-bg-card) !important;
+    border-color: var(--dark-border) !important;
+}
+
+body.dark-mode .result-item h1,
+body.dark-mode .result-item h3 {
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .result-label {
+    color: var(--dark-text-secondary) !important;
+}
+
+/* Botones personalizados */
+body.dark-mode .btn-custom {
+    background-color: var(--dark-accent) !important;
+    border-color: var(--dark-accent) !important;
+    color: white !important;
+}
+
+body.dark-mode .btn-custom:hover {
+    background-color: #5b87dd !important;
+    border-color: #5b87dd !important;
+}
+
+body.dark-mode .btn-secondary {
+    background-color: var(--dark-bg-input) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .btn-secondary:hover {
+    background-color: var(--dark-border) !important;
+}
+
+/* Estados de carga */
+body.dark-mode .loading-state {
+    color: var(--dark-text-secondary) !important;
+}
+
+/* Mensajes de estado */
+body.dark-mode .alert-success {
+    background-color: rgba(40, 167, 69, 0.2) !important;
+    border-color: #28a745 !important;
+    color: var(--dark-text-primary) !important;
+}
+
+/* Títulos principales */
+body.dark-mode #setSelectionView h2,
+body.dark-mode #quizActiveView h2,
+body.dark-mode #resultsView h2 {
+    color: var(--dark-text-primary) !important;
+}
+
+/* Imágenes de los sets */
+body.dark-mode .quiz-set-img {
+    filter: brightness(0.9);
+}
+
+/* Asegurar que todos los textos sean visibles */
+body.dark-mode .quiz-set-card *,
+body.dark-mode .quiz-card *,
+body.dark-mode .results-summary * {
+    color: inherit !important;
+}
+/* ===== ESTILOS ESPECÍFICOS PARA LA VISTA DE RESULTADOS DEL QUIZ ===== */
+
+/* Contenedor principal de resultados */
+body.dark-mode .results-summary {
+    background-color: var(--dark-bg-card) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+/* Items individuales de resultados */
+body.dark-mode .result-item {
+    background-color: var(--dark-bg-secondary) !important;
+    border-color: var(--dark-border) !important;
+}
+
+/* Item del porcentaje específicamente */
+body.dark-mode .result-item.percentage {
+    background-color: var(--dark-accent) !important;
+    border-color: var(--dark-accent) !important;
+}
+
+body.dark-mode .result-item.percentage h1 {
+    color: white !important;
+}
+
+body.dark-mode .result-item.percentage .result-label {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Labels de resultados */
+body.dark-mode .result-label {
+    color: var(--dark-text-secondary) !important;
+}
+
+/* Textos de resultados */
+body.dark-mode .result-item h1,
+body.dark-mode .result-item h3 {
+    color: var(--dark-text-primary) !important;
+}
+
+/* Información de racha */
+body.dark-mode .streak-info {
+    background-color: rgba(100, 149, 237, 0.2) !important;
+    border-color: var(--dark-accent) !important;
+}
+
+/* Botones en vista de resultados */
+body.dark-mode .actions .btn-custom {
+    background-color: var(--dark-accent) !important;
+    border-color: var(--dark-accent) !important;
+    color: white !important;
+}
+
+body.dark-mode .actions .btn-custom:hover {
+    background-color: #5b87dd !important;
+    border-color: #5b87dd !important;
+}
+
+body.dark-mode .actions .btn-secondary {
+    background-color: var(--dark-bg-input) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .actions .btn-secondary:hover {
+    background-color: var(--dark-border) !important;
+}
+
+/* Mensaje de éxito */
+body.dark-mode .alert-success {
+    background-color: rgba(40, 167, 69, 0.2) !important;
+    border-color: #28a745 !important;
+    color: var(--dark-text-primary) !important;
+}
+
+/* Título de resultados completados */
+body.dark-mode #resultsView h2 {
+    color: var(--dark-text-primary) !important;
+}
+/* ===== ESTILOS ESPECÍFICOS PARA LA VISTA DE RESULTADOS DEL QUIZ ===== */
+
+/* Contenedor principal de resultados */
+body.dark-mode #resultsView {
+    background-color: var(--dark-bg-primary) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .results-summary {
+    background-color: var(--dark-bg-card) !important;
+    border: 1px solid var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+/* Items individuales de resultados */
+body.dark-mode .result-item {
+    background-color: var(--dark-bg-secondary) !important;
+    border: 1px solid var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+/* Item del porcentaje específicamente */
+body.dark-mode .result-item.percentage {
+    background: linear-gradient(135deg, var(--dark-accent), #4a7bd9) !important;
+    border-color: var(--dark-accent) !important;
+    color: white !important;
+}
+
+body.dark-mode .result-item.percentage h1 {
+    color: white !important;
+}
+
+body.dark-mode .result-item.percentage .result-label {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Labels de resultados */
+body.dark-mode .result-label {
+    color: var(--dark-text-secondary) !important;
+}
+
+/* Textos de resultados */
+body.dark-mode .result-item h1,
+body.dark-mode .result-item h3 {
+    color: var(--dark-text-primary) !important;
+}
+
+/* Información de racha */
+body.dark-mode .streak-info {
+    background-color: rgba(100, 149, 237, 0.2) !important;
+    border-color: var(--dark-accent) !important;
+}
+
+/* Contenedor de acciones */
+body.dark-mode .actions {
+    background-color: transparent !important;
+}
+
+/* Botones en vista de resultados */
+body.dark-mode .actions .btn-custom {
+    background-color: var(--dark-accent) !important;
+    border-color: var(--dark-accent) !important;
+    color: white !important;
+}
+
+body.dark-mode .actions .btn-custom:hover {
+    background-color: #5b87dd !important;
+    border-color: #5b87dd !important;
+}
+
+body.dark-mode .actions .btn-secondary {
+    background-color: var(--dark-bg-input) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .actions .btn-secondary:hover {
+    background-color: var(--dark-border) !important;
+}
+
+/* Título de resultados completados */
+body.dark-mode #resultsView h2 {
+    color: var(--dark-text-primary) !important;
+    background-color: transparent !important;
+}
+
+/* Reglas de emergencia para forzar modo oscuro en resultados */
+body.dark-mode #resultsView * {
+    background-color: transparent !important;
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark-mode .results-summary * {
+    background-color: transparent !important;
+}
+
+/* Específico para el recuadro del porcentaje */
+body.dark-mode .result-item.percentage,
+body.dark-mode .result-item.percentage * {
+    background: linear-gradient(135deg, var(--dark-accent), #4a7bd9) !important;
+    color: white !important;
+}

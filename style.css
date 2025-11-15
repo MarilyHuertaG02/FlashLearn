@@ -17,6 +17,13 @@ body {
     width: 250px;
     background-color: #fff;
     padding: 20px;
+    /* --- AGREGAR ESTO --- */
+    position: fixed; 
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+    /* -------------------- */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -103,6 +110,8 @@ body {
 .main-content {
     flex-grow: 1;
     padding: 30px;
+    margin-left: 270px; 
+    width: calc(100% - 270px);
 }
 
 .top-bar {
@@ -563,4 +572,314 @@ body {
 
 .hidden {
     display: none !important;
+}
+/* Estilos para la barra de progreso de sets */
+.set-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    border-left: 4px solid #539091;
+}
+
+.set-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.set-header h3 {
+    color: #36454F;
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.cards-count {
+    background: #e6e6fa;
+    color: #4b0082;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.set-description {
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+/* 🔥 NUEVOS ESTILOS DE PROGRESO */
+.progress-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.progress-info span:first-child {
+    color: #36454F;
+    font-weight: 500;
+}
+
+.progress-info span:last-child {
+    color: #539091;
+    font-weight: bold;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4361ee, #3a0ca3);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.progress-stats {
+    text-align: center;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.set-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.subject {
+    background: #e6e6fa;
+    color: #4b0082;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.study-btn {
+    background: #539091;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.3s;
+}
+
+.study-btn:hover {
+    background: #3a0ca3;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.empty-state h3 {
+    color: #36454F;
+    margin-bottom: 10px;
+}
+/* 🎯 ESTILOS PARA BARRA DE PROGRESO DE NIVEL */
+.level-progress-container {
+    margin-top: 8px;
+    width: 100%;
+}
+
+.level-progress-container .level-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-size: 0.75em;
+    color: #666;
+}
+
+.level-progress-container .progress-bar {
+    width: 100%;
+    height: 6px;
+    background-color: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.level-progress-container .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #539091, #6bb7b8);
+    border-radius: 3px;
+    transition: width 0.5s ease-in-out;
+}
+
+/* Efecto de subida de nivel */
+.level-up {
+    animation: levelUpGlow 2s ease-in-out;
+}
+
+@keyframes levelUpGlow {
+    0% { background-color: rgba(83, 144, 145, 0.1); }
+    50% { background-color: rgba(83, 144, 145, 0.3); }
+    100% { background-color: transparent; }
+}
+/* 🎯 ESTILOS PARA BADGE DE SET RECIENTE */
+.set-badge {
+    background: linear-gradient(135deg, #539091, #6bb7b8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.set-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.set-link:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+}
+.share-link-container {
+    display: flex;
+    gap: 5px;
+    margin: 15px 0;
+}
+
+#shareLinkInput {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f7f7f7;
+    font-size: 0.9em;
+    font-weight: 500;
+    color: #333;
+    cursor: text;
+    user-select: all; /* Permite una selección fácil del texto */
+}
+
+.share-link-container #copyShareLinkBtn {
+    /* Estilo del botón de copiar */
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background-color: #539091;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.share-link-container #copyShareLinkBtn:hover {
+    background-color: #4a7d7e;
+}
+
+.share-social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.share-social-icons .social-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: transform 0.2s;
+}
+
+.share-social-icons .social-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Colores de ejemplo para redes sociales (replicando la imagen de Flickr) */
+.social-icon.facebook {
+    background-color: #1877f2;
+}
+.social-icon.twitter {
+    background-color: #1da1f2;
+}
+.social-icon.pinterest {
+    background-color: #bd081c;
+}
+/* Estilos para la nueva disposición de botones en las tarjetas */
+.set-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.study-btn-full {
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    background-color: #539091;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    display: block;
+}
+
+.study-btn-full:hover {
+    background-color: #4a7d7e;
+}
+
+.secondary-actions {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.secondary-actions .btn-secondary {
+    flex: 1;
+    text-align: center;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+}
+
+/* Ajustes para mantener la consistencia visual */
+.set-card .btn-secondary {
+    background-color: #f0f2f5;
+    color: #333;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.set-card .btn-secondary:hover {
+    background-color: #e4e6e9;
 }

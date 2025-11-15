@@ -6,6 +6,7 @@
     <title>FlashLearn - Quizzes</title>
     <link rel="stylesheet" href="style.css"> 
     <link rel="stylesheet" href="quizzes.css"> 
+    <link rel="stylesheet" href="dark-mode.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -21,7 +22,8 @@
                     <li><a href="flashcards.html"><img src="img/flashcard.png" alt="Flashcard Icon"><span>Flashcards</span></a></li>
                     <li class="active"><a href="quizzes.html"><img src="img/quiz.png" alt="Quizzes Icon"><span>Quizzes</span></a></li>
                     <li><a href="creacion.html"><img src="img/create.png" alt="Create Icon"><span>Creación de Flashcards</span></a></li>
-                    <li><a href="crearQuices.html" id="nav-create"><img src="img/addquiz.png" alt="Create Icon"><span>Creación de Quizzes</span></a></li>                    
+                    <li><a href="crearQuices.html" id="nav-create"><img src="img/addquiz.png" alt="Create Icon"><span>Creación de Quizzes</span></a></li>
+                                        
                 </ul>
             </nav>
             <div class="logout-btn">
@@ -70,27 +72,34 @@
                 </div>
 
                 <div id="resultsView" class="hidden">
-                    <h2>¡Quiz Completado!</h2>
-                    <div class="results-summary">
-                        <div class="result-item">
-                            <p class="result-label">Ganancia:</p>
-                            <h3 id="pointsGainedDisplay">+0 Puntos</h3> 
-                        </div>
+    <h2>¡Quiz Completado!</h2>
+    <div class="results-summary">
+        <div class="result-item">
+            <p class="result-label">Ganancia:</p>
+            <h3 id="pointsGainedDisplay">+0 Puntos</h3> 
+        </div>
 
-                        <div class="result-item">
-                            <p class="result-label">Aciertos:</p>
-                            <h3 id="correctCount">0/0</h3>
-                        </div>
-                        
-                        <div class="result-item percentage">
-                            <p class="result-label">Porcentaje:</p>
-                            <h1 id="scorePercentage">0%</h1>
-                        </div>
-                        <div class="result-item streak-info">
-                            <p class="result-label">Nueva Racha:</p>
-                            <h3 id="newStreakDays">0 Días</h3>
-                        </div>
-                    </div>
+        <div class="result-item">
+            <p class="result-label">Aciertos:</p>
+            <h3 id="correctCount">0/0</h3>
+        </div>
+        
+        <div class="result-item percentage">
+            <p class="result-label">Porcentaje:</p>
+            <h1 id="scorePercentage">0%</h1>
+        </div>
+        <div class="result-item streak-info">
+            <p class="result-label">Nueva Racha:</p>
+            <h3 id="newStreakDays">0 Días</h3>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button id="retakeQuizBtn" class="btn-custom">Repetir Quiz</button>
+        
+        <button id="backToSetsBtn" class="btn-secondary">Volver a Quizzes</button>
+    </div>
+</div>
                     </div>
 
             </div>
@@ -151,11 +160,30 @@
             <button id="closeSuccessBtn" class="btn-popup btn-popup-confirm">Aceptar</button>
         </div>
     </div>
-</div>    
+</div>  
+<!-- Agrega esto después del popup de éxito de eliminación -->
+<div id="sharePopup" class="popup-overlay hidden">
+    <div class="popup-container">
+        <div class="popup-header">
+            <h3>Compartir Quiz</h3>
+        </div>
+        <div class="popup-body">
+            <p>Copia el enlace para que otros puedan realizar este quiz:</p>
+            <div class="share-link-container">
+                <input type="text" id="shareLinkInput" value="" readonly>
+                <button id="copyShareLinkBtn" class="btn-primary btn-sm">Copiar</button>
+            </div>
+        </div>
+        <div class="popup-actions">
+            <button id="closeSharePopupBtn" class="btn-popup btn-popup-cancel">Cerrar</button>
+        </div>
+    </div>
+</div>  
     <script type="module" src="firebase.js"></script>
     <script type="module" src="auth.js"></script>
     <script type="module" src="user-auth.js"></script>
     <script type="module" src="utils.js"></script>
     <script type="module" src="quizzes.js"></script> 
+    <script src="scriptMO.js"></script>  
 </body>
 </html>

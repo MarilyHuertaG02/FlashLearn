@@ -20,4 +20,15 @@ export function setupNavigation() {
             });
         }
     });
+    // En utils.js o en un nuevo archivo
+    document.addEventListener('DOMContentLoaded', () => {
+    const badgesNav = document.getElementById('nav-badges');
+    if (badgesNav) {
+        badgesNav.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Por ahora mostramos un mensaje, pero podríamos crear badges.html
+            alert('Próximamente: Galería de Insignias');
+        });
+    }
+});
 }
